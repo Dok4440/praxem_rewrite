@@ -1,0 +1,13 @@
+# ENV
+.env
+.env.example
+.env.local
+.env.staging
+
+# __pycache__
+cogs/__pycache__/
+tools/__pycache__/
+
+# profiles
+tools/art/result_profile_*.*
+tools/art/result_dia_*.*
