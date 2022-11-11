@@ -23,7 +23,7 @@ class Miscellaneous(commands.Cog):
     async def info(self, ctx, option: discord.Option(choices=["ping", "uptime", "stats", "invite",
                                                               "documentation", "version", "legal"])):
         if option == "ping":
-            await ctx.respond(f"Project Ax bot latency: {round(self.bot.latency*1000, 2)} ms")
+            await ctx.respond(f"Project Ax Latency: {round(self.bot.latency*1000, 2)} ms")
 
         elif option == "uptime":
             uptime = str(datetime.timedelta(seconds=int(round(time.time() - bot_launch_time))))
