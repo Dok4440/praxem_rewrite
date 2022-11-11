@@ -47,7 +47,7 @@ class Owneronly(commands.Cog):
         default_member_permissions=discord.Permissions(permissions=8),
         guild_ids=["1038051105642401812", "803957895603027978"])
     @commands.check(is_owner)
-    async def die(self, ctx, *, message=None):
+    async def die(self, ctx, *, message: discord.Option(str) = None):
         em = discord.Embed(color=0xadcca6)
         time_on_die = datetime.now()
 
@@ -57,8 +57,8 @@ class Owneronly(commands.Cog):
                      "user_discrim": ctx.author.discriminator, "time_on_die": time_on_die}}, upsert=True)
 
         if message == "pull":
-            if (os.system("sudo sh rAIOmp.sh") / 256) > 1:
-                var = os.system("sudo sh rAIOmp.sh")  # this will run os.system() AGAIN.
+            if (os.system("sh rAIOmp.sh") / 256) > 1:
+                var = os.system("sh rAIOmp.sh")  # this will run os.system() AGAIN.
                 await ctx.respond(
                     f"Couldn't run `rAIOmp.sh`\n\n*os.system() output for BETA testing purposes; {var}*")
             else:
@@ -66,8 +66,8 @@ class Owneronly(commands.Cog):
                 await ctx.respond(embed=em)
 
         else:
-            if (os.system("sudo sh rAIOm.sh") / 256) > 1:
-                var = os.system("sudo sh rAIOm.sh")  # this will run os.system() AGAIN.
+            if (os.system("sh rAIOm.sh") / 256) > 1:
+                var = os.system("sh rAIOm.sh")  # this will run os.system() AGAIN.
                 await ctx.respond(
                     f"Couldn't run `rAIOm.sh`\n\n*os.system() output for BETA testing purposes; {var}*")
             else:
