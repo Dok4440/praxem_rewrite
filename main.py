@@ -12,7 +12,7 @@ pr_client = discord.Bot()
 async def on_ready():
     print('Bot is online.')
     game = discord.Game("/help")
-    await pr_client.change_presence(status=discord.Status.online, activity=game)
+    await pr_client.change_presence(status=discord.Status.do_not_disturb, activity=game)
 
 
 for filename in os.listdir('./modules'):

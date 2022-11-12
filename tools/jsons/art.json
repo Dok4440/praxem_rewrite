@@ -1,0 +1,48 @@
+{
+  "longsword": "https://i.imgur.com/JQDruVi.png",
+  "mace": "https://i.imgur.com/WX3Nc8K.png",
+  "katana": "https://i.imgur.com/8xvWm3g.png",
+  "dagger": "https://i.imgur.com/lSRqBKN.png",
+  "greatsword": "https://i.imgur.com/iT8JH2h.png",
+  "sledgehammer": "https://i.imgur.com/mXE5Gfx.png",
+  "bow": "https://i.imgur.com/VVCvPNE.png",
+  "longbow": "https://i.imgur.com/Fac0WdQ.png",
+
+  "longsword_emote_id": 841591365649170463,
+  "mace_emote_id": 841591275567579156,
+  "katana_emote_id": 841591388055273472,
+  "dagger_emote_id": 841591344308158516,
+  "greatsword_emote_id": 841591317368799242,
+  "sledgehammer_emote_id": 841591294115315753,
+  "bow_emote_id": 841631789675053077,
+  "longbow_emote_id": 841592788084326400,
+
+  "healing_potion": "https://i.imgur.com/ZpE5b68.png",
+
+  "healing_potion_emote_id": 845723621535121418,
+
+  "gem_sp": "https://i.imgur.com/TJEY1CZ.png",
+  "gem_df": "https://i.imgur.com/4YwywEC.png",
+  "gem_dg": "https://i.imgur.com/USEO2XT.png",
+  "gem_ac": "https://i.imgur.com/UtflJI8.png",
+
+  "training_dummy": "https://i.imgur.com/6ijSWB6.png",
+
+  "tool_axe": "https://i.imgur.com/XCF9MhE.png",
+  "tool_pickaxe": "https://i.imgur.com/eGP9hZq.png",
+  "tool_fishing_rod": "https://i.imgur.com/59Ii8TC.png",
+  "tool_scissors": "https://i.imgur.com/HDuyIPV.png",
+
+  "bot_icon_greatsword": "https://i.imgur.com/Tm1RAGs.png",
+  "bot_icon_longsword": "https://i.imgur.com/tXbzgZD.png",
+  "bot_icon_longbow": "https://i.imgur.com/C3rOUew.png",
+
+  "bot_icon_greatsword_small": "https://i.imgur.com/Gh4ekIS.png",
+  "bot_icon_longsword_small": "https://i.imgur.com/eeGYJgf.png",
+  "bot_icon_longbow_small": "https://i.imgur.com/CfZdEeE.png",
+
+  "badge_admin_emote_id": 861292012766363658,
+  "badge_beta_tester_emote_id": 861315295838470165,
+  "badge_admin": "https://i.imgur.com/XQ9qxH1.png",
+  "badge_beta_tester": "https://i.imgur.com/Z8zQXuQ.png"
+}

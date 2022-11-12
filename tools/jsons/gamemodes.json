@@ -1,0 +1,19 @@
+{
+  "easy_dmg": 60,
+  "easy_acc": 55,
+  "easy_def": 25,
+  "easy_spd": 3000,
+  "easy_hp": 250,
+
+  "medium_dmg": 80,
+  "medium_acc": 70,
+  "medium_def": 40,
+  "medium_spd": 1500,
+  "medium_hp": 500,
+
+  "hard_dmg": 100,
+  "hard_acc": 90,
+  "hard_def": 50,
+  "hard_spd": 500,
+  "hard_hp": 1000
+}
