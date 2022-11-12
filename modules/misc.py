@@ -19,7 +19,7 @@ class Miscellaneous(commands.Cog):
         name="info",
         description="Info about Praxem.",
         guild_only=False)
-    async def info(self, ctx, option: discord.Option(choices=["ping", "uptime", "stats", "invite",
+    async def info(self, ctx, option: discord.Option(choices=["ping", "uptime", "team", "invite",
                                                               "documentation", "version", "legal"])):
         if option == "ping":
             await ctx.respond(f"Project Ax Latency: {round(self.bot.latency*1000, 2)} ms")
@@ -31,7 +31,7 @@ class Miscellaneous(commands.Cog):
             em.set_author(name=f"Project Ax {v}", icon_url= self.bot.user.avatar)
             await ctx.respond(embed=em)
 
-        elif option == "stats":
+        elif option == "team":
             em = discord.Embed(color=0xadcca6)
             v = tools.get_version()
             em.set_author(name=f"Project Ax {v}", icon_url=self.bot.user.avatar)
