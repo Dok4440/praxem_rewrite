@@ -18,8 +18,7 @@ class Miscellaneous(commands.Cog):
     @discord.slash_command(
         name="info",
         description="Info about Praxem.",
-        guild_only=False,
-        default_member_permissions=discord.Permissions(permissions=0))
+        guild_only=False)
     async def info(self, ctx, option: discord.Option(choices=["ping", "uptime", "stats", "invite",
                                                               "documentation", "version", "legal"])):
         if option == "ping":

@@ -44,7 +44,7 @@ class Owneronly(commands.Cog):
         name="die",
         description="Only Dok#4440 can do this. Command will only show up in this server.",
         guild_only=True,
-        default_member_permissions=discord.Permissions(permissions=8),
+        # default_member_permissions=discord.Permissions(permissions=8),
         guild_ids=["1038051105642401812", "803957895603027978"])
     @commands.check(is_owner)
     async def die(self, ctx, *, message: discord.Option(str) = None):
