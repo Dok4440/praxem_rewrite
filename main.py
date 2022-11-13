@@ -5,7 +5,7 @@ import discord
 from dotenv import load_dotenv
 
 logging.basicConfig(level=logging.INFO)
-pr_client = discord.Bot()
+pr_client = discord.Bot(intents=discord.Intents.all())
 
 
 @pr_client.event
