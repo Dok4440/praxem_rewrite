@@ -26,7 +26,8 @@ def create_profile(id, gender, height, friend_id, age):
                               "friend_id": friend_id,
                               "age": age,
                               "xp": 0,
-                              "bio": ""
+                              "bio": "",
+                              "badges": ""
                               })
 
 def delete_inventory(id):
