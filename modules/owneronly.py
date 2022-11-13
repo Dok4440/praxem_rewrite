@@ -1,10 +1,12 @@
 import os
+import random
 from datetime import datetime
 
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv
 from pymongo import MongoClient
+from tools import tools
 
 load_dotenv('.env')
 dbclient = MongoClient(os.getenv('DBSTRING1'))
@@ -45,7 +47,8 @@ class Owneronly(commands.Cog):
         description="Only Dok#4440 can do this. Command will only show up in this server.",
         guild_only=True,
         default_member_permissions=discord.Permissions(permissions=8),
-        guild_ids=["803957895603027978"])
+        guild_ids=["803957895603027978"]
+    )
     @commands.check(is_owner)
     async def die(self, ctx, *, message: discord.Option(str) = None):
         em = discord.Embed(color=0xadcca6)
@@ -79,6 +82,19 @@ class Owneronly(commands.Cog):
         await ctx.respond("Error: you're not bot owner. FYI: " +
                           "this command is __only__ available in the official Praxem server, " +
                           "so you won't be bothered by it anywhere else.")
+
+    @discord.slash_command(
+        name="vsay",
+        description="Only Dok#4440 can do this. Command will only show up in this server.",
+        default_member_permissions=discord.Permissions(permissions=8),
+        guild_ids=["803957895603027978"]
+    )
+    async def vsay(self, ctx, *, message: discord.Option(str)):
+        emotes = [847124036206592020, 847124109875478591,
+                  847124082541854781, 847124132746756159]
+
+        emote = random.choice(emotes)
+        await ctx.send(f"{self.bot.get_emoji(emote)} `{tools.get_version()}` — {message}")
 
 
 def setup(client):
