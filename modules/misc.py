@@ -2,7 +2,7 @@ import discord
 import time, datetime
 from discord.ext import commands
 from discord.ui import Button, View
-from tools import tools
+from tools import tools, interaction
 
 bot_launch_time=time.time()
 
@@ -62,6 +62,18 @@ class Miscellaneous(commands.Cog):
             em = discord.Embed(color=0xadcca6, title="Legal", description=f"http://praxem.wikidot.com/legal\nhttp://praxem.wikidot.com/privacy\nhttp://praxem.wikidot.com/terms")
             em.set_footer( text="Note that by using any commands on Praxem, or by accessing the links above you automatically agree to the Privacy Policy and Terms and Conditions.")
             await ctx.respond(embed=em)
+
+    @discord.slash_command(
+        name = "report",
+        description = "Report a user for violating the Project Ax terms.",
+        guild_only = True
+    )
+    async def report(self, ctx, *, user: discord.Option(discord.Member)):
+        report_channel = self.bot.get_channel(int(1041456824894890064))
+        user_id = f"{user} - {user.id}"
+
+        modal = interaction.Report(ctx, user_id, report_channel, title="User Report")
+        await ctx.send_modal(modal)
 
 
 def setup(pr_client):

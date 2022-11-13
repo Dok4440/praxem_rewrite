@@ -18,6 +18,7 @@ def create_inventory(id, main_weapon, secondary_weapon):
                                 "balance": 0
                                 })
 
+
 def create_profile(id, gender, height, friend_id, age):
     db["Profile"].insert_one({"_id": id,
                               "gender": gender,

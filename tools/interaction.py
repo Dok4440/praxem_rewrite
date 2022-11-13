@@ -1,5 +1,5 @@
 import discord
-from discord.ui import Button, View
+from discord.ui import Button, View, Modal
 from tools import wembeds
 
 
@@ -72,3 +72,22 @@ class WeaponNavButtons(View):
             return False
         else:
             return True
+
+
+class Report(Modal):
+    def __init__(self, ctx, user_id, channel, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.ctx = ctx
+        self.user_id = user_id
+        self.channel = channel
+
+        self.add_item(discord.ui.InputText(label="User (ID)", value=f"{self.user_id}"))
+        self.add_item(discord.ui.InputText(label="Reason", style=discord.InputTextStyle.long))
+
+    async def callback(self, interaction):
+        embed = discord.Embed(title="User Report")
+        embed.add_field(name="User", value=self.children[0].value, inline=False)
+        embed.add_field(name="Reason", value=self.children[1].value, inline=False)
+        embed.set_footer(text=f"by {self.ctx.author.id} - {self.ctx.author.name}#{self.ctx.author.discriminator}")
+        await self.channel.send(embeds=[embed])
+        await interaction.response.send_message("User successfully reported!", ephemeral=True)
