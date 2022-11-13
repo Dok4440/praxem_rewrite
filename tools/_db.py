@@ -19,7 +19,7 @@ def delete_inventory(id):
 
 def get_weapons(id):
     for b in db["Inventory"].find({"_id": id}):
-        return (b["main_weapon"], b["secondary_weapon"], b["main_weapon_xp"], b["secondary_weapon_xp"])
+        return b["main_weapon"], b["secondary_weapon"], b["main_weapon_xp"], b["secondary_weapon_xp"]
 
 
 def get_balance(id):
@@ -45,7 +45,7 @@ def get_item(id, item, guild_id, mainCommand):
     if check != 0:
         return get_items_precheck(id, item, mainCommand)
 
-    return f"You don't have a profile yet. Create one: `{get_prefix(guild_id)}createprofile`"
+    return f"You don't have a profile yet. Create one."
 
 
 def get_weapon_stats(weapon, stat):

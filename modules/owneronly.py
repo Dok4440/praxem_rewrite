@@ -96,6 +96,29 @@ class Owneronly(commands.Cog):
         emote = random.choice(emotes)
         await ctx.send(f"{self.bot.get_emoji(emote)} `{tools.get_version()}` — {message}")
 
+    @discord.slash_command(
+        name="dbedit",
+        description="Only Dok#4440 can do this. Command will only show up in this server.",
+        default_member_permissions=discord.Permissions(permissions=8),
+        guild_ids=["803957895603027978"]
+    )
+    async def dbedit(self, ctx, *, option: discord.Option(choices=["add item INT", "add item STR"]),
+                     table: discord.Option(choices=["DieMessage", "Inventory", "Profile",
+                                                    "Training", "WeaponStats", "Warnings"]),
+                     query_name: discord.Option(str),
+                     query_value_int: discord.Option(int) = None,
+                     query_value_str: discord.Option(str) = None):
+
+        if option == "add item INT":
+            db[table].update_many({query_name: {"$exists": False}}, {"$set": {query_name: query_value_int}})
+            await ctx.respond("Added {" + query_name + ":" + str(query_value_int) +
+                              "} to all documents in table " + str(table))
+
+        elif option == "add item STR":
+            db[table].update_many({query_name: {"$exists": False}}, {"$set": {query_name: query_value_str}})
+            await ctx.respond("Added {" + query_name + ":" + str(query_value_str) +
+                              "} to all documents in table " + str(table))
+
 
 def setup(client):
     client.add_cog(Owneronly(client))
