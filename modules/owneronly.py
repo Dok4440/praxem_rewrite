@@ -112,12 +112,12 @@ class Owneronly(commands.Cog):
         if option == "add item INT":
             db[table].update_many({query_name: {"$exists": False}}, {"$set": {query_name: query_value_int}})
             await ctx.respond("Added {" + query_name + ":" + str(query_value_int) +
-                              "} to all documents in table " + str(table))
+                              "} to all documents in table " + str(table) + "**DONT FORGET TO ADD TO CREATION CODE**")
 
         elif option == "add item STR":
             db[table].update_many({query_name: {"$exists": False}}, {"$set": {query_name: query_value_str}})
             await ctx.respond("Added {" + query_name + ":" + str(query_value_str) +
-                              "} to all documents in table " + str(table))
+                              "} to all documents in table " + str(table) + "**DONT FORGET TO ADD TO CREATION CODE**")
 
 
 def setup(client):

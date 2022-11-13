@@ -5,7 +5,7 @@ import random
 
 
 def get_version():
-    return "v1.5.0"
+    return "v1.5.1"
 
 
 def get_target(target, id):

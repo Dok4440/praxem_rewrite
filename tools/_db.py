@@ -10,8 +10,24 @@ db = dbclient[os.getenv('DBSTRING2')]
 
 
 def create_inventory(id, main_weapon, secondary_weapon):
-    db["Inventory"].insert_one({"_id": id, "main_weapon": main_weapon, "secondary_weapon": secondary_weapon, "main_weapon_xp": 0, "secondary_weapon_xp": 0, "balance": 0})
+    db["Inventory"].insert_one({"_id": id,
+                                "main_weapon": main_weapon,
+                                "secondary_weapon": secondary_weapon,
+                                "main_weapon_xp": 0,
+                                "secondary_weapon_xp": 0,
+                                "balance": 0
+                                })
 
+def create_profile(id, gender, height, friend_id, age):
+    db["Profile"].insert_one({"_id": id,
+                              "gender": gender,
+                              "height": height,
+                              "location": "Ryedyng",
+                              "friend_id": friend_id,
+                              "age": age,
+                              "xp": 0,
+                              "bio": ""
+                              })
 
 def delete_inventory(id):
     db["Inventory"].delete_one({"_id": id})
