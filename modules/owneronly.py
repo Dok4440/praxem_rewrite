@@ -119,7 +119,7 @@ class Owneronly(commands.Cog):
             # update db["Items"]
             db["Items"].insert_one({"_id": name.lower(), "description": description,
                                     "cost": cost, "image_url": image_url, "emote_id": int(emote_id),
-                                    "type": item_type, "sell_value": sell_value, "quote": quote})
+                                    "item_type": item_type, "sell_value": sell_value, "quote": quote})
 
             # update existing inventories (dangerous)
             db["Inventory"].update_many({name: {"$exists": False}}, {"$set": {name.lower(): 0}})
