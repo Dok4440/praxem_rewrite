@@ -58,14 +58,17 @@ class Inventory(commands.Cog):
         secondary_weapon = inventory_list[1]
         balance = inventory_list[4]
 
-        '''ITEM PAGES'''
+        '''ITEM PAGES AND CHECK IF AMOUNT=0'''
         items = inventory_list[5:]
         items = tools.decorate_inv_items(items)
 
-        '''as long as there are no pages (5 per page)'''
         page_1 = ""
-        for item in items:
-            page_1 += "{}\n\n".format(item)
+
+        if len(items) == 0:
+            page_1 += "You don't have any items."
+        else:
+            for item in items:
+                page_1 += "{}\n\n".format(item)
 
         '''CREATE EMBED'''
         em=discord.Embed(color=0xadcca6, title=f"{ctx.author.name}'s Inventory",

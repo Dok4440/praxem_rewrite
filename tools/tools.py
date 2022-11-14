@@ -5,7 +5,7 @@ import random
 
 
 def get_version():
-    return "v1.6.1"
+    return "v1.6.2"
 
 
 def get_target(target, id):
@@ -60,15 +60,25 @@ def decorate_inv_list(list):
 
 
 def decorate_inv_items(list):
+    items_to_pop = []
+
     for i in range(len(list)):
         li = list[i].split(': ')
 
         '''# INSERT EMOTE HERE TOO LATER'''
         emote = '🍎'
-        name = f"{li[0].capitalize()}"
-        value = f"`{li[1]}`"
+        name = li[0]
+        value = li[1]
 
-        li = f"{emote} {name}\n— *Amount: {value}*"
+        li = f"{emote} {name.capitalize()}\n— *Amount: `{value}`*"
         list[i] = li
+
+        '''if value = 0, add to pop list'''
+        if int(value) == 0:
+            items_to_pop.append(i)
+
+    '''items to remove if value = 0'''
+    for i in range(len(items_to_pop)):
+        list.pop(items_to_pop[i]-i)
 
     return list
