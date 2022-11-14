@@ -21,11 +21,11 @@ class Inventory(commands.Cog):
         print('inventory.py -> on_ready()')
 
     @discord.slash_command(
-        name="inventory",
-        description="View your inventory",
+        name="bag",
+        description="View your bag.",
         guild_only=True
     )
-    async def inventory(self, ctx):
+    async def bag(self, ctx):
         target = ctx.author.id
 
         check = db["Inventory"].count_documents({"_id": target})
@@ -57,7 +57,7 @@ class Inventory(commands.Cog):
 
         '''ITEM PAGES AND CHECK IF AMOUNT=0'''
         items = inventory_list[5:]
-        items = item_handling.decorate_inventory_items(items)
+        items = item_handling.decorate_inventory_items(items, self.bot)
 
         page_1 = ""
 
@@ -85,21 +85,26 @@ class Inventory(commands.Cog):
         guild_only=True
     )
     async def item(self, ctx, *, item: discord.Option(choices=item_handling.inventory_list()[5:])):
+        item_amount = 0
         inventory = db["Inventory"].find({"_id": ctx.author.id})
         for i in inventory:
             item_amount = i[item]
 
-        description = ""
+        description = "N/A - no `db[Items]` ?"
         cost = 0
-        thumbnail = ""
-        emote = None
+        thumbnail = _json.get_art()["bot_icon_longbow"]
+        emote = "❓"
 
-        items = db["Items"].find({"_id": item})
-        for info in items:
-            description = info["description"]
-            cost = info["cost"]
-            thumbnail = info["image_url"]
-            emote = self.bot.get_emoji(info["emote_id"])
+        try:
+            items = db["Items"].find({"_id": item})
+            for info in items:
+                description = info["description"]
+                cost = info["cost"]
+                thumbnail = info["image_url"]
+                emote = self.bot.get_emoji(info["emote_id"])
+
+        except Exception as error:
+            description += f"\n\n`{error}`"
 
         ''' CREATE EMBED'''
         em = discord.Embed(color=0xadcca6, title=f"{emote} {item}", description=f"**Item cost: {cost}**")

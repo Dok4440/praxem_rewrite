@@ -96,7 +96,9 @@ class Owneronly(commands.Cog):
         emote = random.choice(emotes)
         await ctx.send(f"{self.bot.get_emoji(emote)} `{tools.get_version()}` — {message}")
 
-    @discord.slash_command(
+    botconfig = discord.SlashCommandGroup("botconfig", "Settings for Project Ax bot admins.")
+
+    @botconfig.command(
         name="add_item",
         description="Adds a new item to all inventories. Use with CAUTION.",
         default_member_permissions=discord.Permissions(permissions=32), #ManageServer
@@ -107,7 +109,8 @@ class Owneronly(commands.Cog):
                      item_description: discord.Option(str, description="Provide a description for this item."),
                      item_cost: discord.Option(int, description="Whole, positive number."),
                      image_url: discord.Option(str, description="Imgur link of icon."),
-                     emote_id: discord.Option(float, description="Emote id of icon")):
+                     emote_id: discord.Option(float, description="Emote id of icon")
+                       ):
 
         try:
             # update db["Items"]
@@ -126,6 +129,33 @@ class Owneronly(commands.Cog):
                           f"Added *{item_name}* to db[Items].\n"
                           f"Make sure to edit `tools/item_handling.py` to let any changes take effect."
                           f"/item will contain the new item after reboot.")
+
+    @botconfig.command(
+        name = "add_weapon",
+        description="Adds a new weapon to the database. Use with CAUTION.",
+        default_member_permissions=discord.Permissions(permissions=32),
+        guild_ids=["803957895603027978"]
+    )
+    async def add_weapon(self, ctx, *,
+                         name: discord.Option(str, description="Name of the weapon"),
+                         damage: discord.Option(int),
+                         accuracy: discord.Option(int),
+                         defense: discord.Option(int)
+                         ):
+        try:
+            # update db["WeaponStats"]
+            db["WeaponStats"].insert_one({"_id": name.lower(), "damage": damage,
+                                         "accuracy": accuracy, "defense": defense})
+
+        except Exception as error:
+            await ctx.respond(f"Something went wrong. Do not try again.\n"
+                              f"{error}")
+            return
+
+        await ctx.respond(f"Added *{name}* to the list of weapons.\n"
+                          f"Stats: {damage} dmg, {accuracy} %acc, {defense} %def.\n"
+                          f"Make sure to edit `profile.py` to let any changes take effect.\n"
+                          f"Reboot.")
 
 
 def setup(client):

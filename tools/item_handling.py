@@ -25,18 +25,29 @@ def inventory_list():
             "secondary_weapon_xp", "balance", "apple", "teleporting_potion"]
 
 
-def decorate_inventory_items(list):
+def get_item_emote(item, bot):
+    emote = '❓'
+
+    items = db["Items"].find({"_id": item})
+    for i in items:
+        emote = bot.get_emoji(i["emote_id"])
+
+    return emote
+
+
+def decorate_inventory_items(list, bot):
     items_to_pop = []
 
     for i in range(len(list)):
         li = list[i].split(': ')
 
         '''# INSERT EMOTE HERE TOO LATER'''
-        emote = '🍎'
         name = li[0]
+        print(name)
         value = li[1]
+        emote = get_item_emote(name.replace(" ", "_"), bot)
 
-        li = f"{emote} {name.capitalize()}\n— *Amount: `{value}`*"
+        li = f"{emote} {name}\n— *Amount: `{value}`*"
         list[i] = li
 
         '''if value = 0, add to pop list'''

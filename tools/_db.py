@@ -61,8 +61,9 @@ def get_weapon_stats(weapon, stat):
         return b[stat]
 
 
+
 def get_weapon_stats_list(weapon):
-    return f"Damage: {get_weapon_stats(weapon, 'damage')}\nAccuracy: {get_weapon_stats(weapon, 'accuracy')}%\nDefence: {get_weapon_stats(weapon, 'defence')}%"
+    return f"Damage: {get_weapon_stats(weapon, 'damage')}\nAccuracy: {get_weapon_stats(weapon, 'accuracy')}%\nDefense: {get_weapon_stats(weapon, 'defense')}%"
 
 
 def get_training_status(id):
