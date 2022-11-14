@@ -105,17 +105,17 @@ class Owneronly(commands.Cog):
         guild_ids=["803957895603027978"]
     )
     async def add_item(self, ctx, *,
-                     item_name: discord.Option(str, description="One word. e.g. 'one two' becomes one_two."),
-                     item_description: discord.Option(str, description="Provide a description for this item."),
-                     item_cost: discord.Option(int, description="Whole, positive number."),
-                     image_url: discord.Option(str, description="Imgur link of icon."),
-                     emote_id: discord.Option(float, description="Emote id of icon")
+                       item_name: discord.Option(str, description="One word. e.g. 'one two' becomes one_two."),
+                       item_description: discord.Option(str, description="Provide a description for this item."),
+                       item_cost: discord.Option(int, description="Whole, positive number."),
+                       image_url: discord.Option(str, description="Imgur link of icon."),
+                       emote_id: discord.Option(str, description="ONLY ID (series of numbers)")
                        ):
 
         try:
             # update db["Items"]
             db["Items"].insert_one({"_id": item_name.lower(), "description": item_description,
-                                    "cost": item_cost, "image_url": image_url, "emote_id": emote_id})
+                                    "cost": item_cost, "image_url": image_url, "emote_id": int(emote_id)})
             # update existing inventories (dangerous)
             db["Inventory"].update_many({item_name: {"$exists": False}}, {"$set": {item_name.lower(): 0}})
 
