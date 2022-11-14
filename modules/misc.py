@@ -68,12 +68,25 @@ class Miscellaneous(commands.Cog):
         description = "Report a user for violating the Project Ax terms.",
         guild_only = True
     )
-    async def report(self, ctx, *, user: discord.Option(discord.Member)):
-        report_channel = self.bot.get_channel(int(1041456824894890064))
+    @commands.cooldown(1, 60, commands.BucketType.user)
+    async def report(self, ctx, *, user: discord.Option(discord.Member),
+                     reason: discord.Option(input_type=str,
+                                            description="Only the Project Ax official Team will see this.",
+                                            min_length=10,
+                                            max_length=500)):
+
         user_id = f"{user} - {user.id}"
 
-        modal = interaction.Report(ctx, user_id, report_channel, title="User Report")
-        await ctx.send_modal(modal)
+        embed = discord.Embed(title="User Report")
+        embed.add_field(name="User", value=user_id, inline=False)
+        embed.add_field(name="Reason", value=reason, inline=False)
+        embed.set_footer(text=f"by {ctx.author.id} - {ctx.author.name}#{ctx.author.discriminator}")
+
+        '''#praxem-reports in the official Project Ax server.'''
+        report_channel = self.bot.get_channel(int(1041456824894890064))
+        await report_channel.send(embeds=[embed])
+
+        await ctx.respond("✅ User successfully reported!\n\n**DO NOT** report in bulk. Spamming reports will result in a Project Ax ban.", ephemeral=True)
 
 
 def setup(pr_client):

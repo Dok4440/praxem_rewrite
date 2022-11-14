@@ -75,6 +75,7 @@ class WeaponNavButtons(View):
 
 
 class Report(Modal):
+    # NOT IN USE, DISCORD BUG.
     def __init__(self, ctx, user_id, channel, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.ctx = ctx
