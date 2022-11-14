@@ -6,7 +6,7 @@ from discord.ext import commands
 from dotenv import load_dotenv
 from pymongo import MongoClient
 
-from tools import interaction, wembeds, _json, _db, embeds, tools
+from tools import interaction, wembeds, _json, _db, tools
 
 load_dotenv('.env')
 dbclient = MongoClient(os.getenv('DBSTRING1'))
@@ -180,7 +180,7 @@ class Profile(commands.Cog):
         except:
             pass
 
-        em = discord.Embed(title=f"{ctx.author.name}'s profile {badges_string}",
+        em = discord.Embed(title=f"{ctx.author.name}'s Profile {badges_string}",
                            description=f"Lv. {xp}\n "
                                        f"[-----------](http://praxem.wikidot.com/start)\n"
                                        f"{bio}\n\n"

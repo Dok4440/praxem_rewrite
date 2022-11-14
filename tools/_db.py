@@ -15,8 +15,15 @@ def create_inventory(id, main_weapon, secondary_weapon):
                                 "secondary_weapon": secondary_weapon,
                                 "main_weapon_xp": 0,
                                 "secondary_weapon_xp": 0,
-                                "balance": 0
+                                "balance": 0,
+                                "apple": 1,
+                                "teleporting_potion": 3
                                 })
+
+
+def inv_list():
+    return ["main_weapon", "secondary_weapon", "main_weapon_xp",
+            "secondary_weapon_xp", "balance", "apple", "teleporting_potion"]
 
 
 def create_profile(id, gender, height, friend_id, age):
