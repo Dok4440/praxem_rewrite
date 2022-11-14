@@ -44,6 +44,5 @@ class Help(commands.Cog):
         await ctx.respond(embed=embeds.help_command_embed(name, description, usage, options, permissions))
 
 
-
 def setup(client):
     client.add_cog(Help(client))

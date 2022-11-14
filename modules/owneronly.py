@@ -97,27 +97,35 @@ class Owneronly(commands.Cog):
         await ctx.send(f"{self.bot.get_emoji(emote)} `{tools.get_version()}` — {message}")
 
     @discord.slash_command(
-        name="dbedit",
-        description="Only Dok#4440 can do this. Command will only show up in this server.",
-        default_member_permissions=discord.Permissions(permissions=8),
+        name="add_item",
+        description="Adds a new item to all inventories. Use with CAUTION.",
+        default_member_permissions=discord.Permissions(permissions=32), #ManageServer
         guild_ids=["803957895603027978"]
     )
-    async def dbedit(self, ctx, *, option: discord.Option(choices=["add item INT", "add item STR"]),
-                     table: discord.Option(choices=["DieMessage", "Inventory", "Profile",
-                                                    "Training", "WeaponStats", "Warnings"]),
-                     query_name: discord.Option(str),
-                     query_value_int: discord.Option(int) = None,
-                     query_value_str: discord.Option(str) = None):
+    async def add_item(self, ctx, *,
+                     item_name: discord.Option(str, description="One word. e.g. 'one two' becomes one_two."),
+                     item_description: discord.Option(str, description="Provide a description for this item."),
+                     item_cost: discord.Option(int, description="Whole, positive number."),
+                     image_url: discord.Option(str, description="Imgur link of icon."),
+                     emote_id: discord.Option(float, description="Emote id of icon")):
 
-        if option == "add item INT":
-            db[table].update_many({query_name: {"$exists": False}}, {"$set": {query_name: query_value_int}})
-            await ctx.respond("Added {" + query_name + ":" + str(query_value_int) +
-                              "} to all documents in table " + str(table) + "**DONT FORGET TO ADD TO CREATION CODE**")
+        try:
+            # update db["Items"]
+            db["Items"].insert_one({"_id": item_name.lower(), "description": item_description,
+                                    "cost": item_cost, "image_url": image_url, "emote_id": emote_id})
+            # update existing inventories (dangerous)
+            db["Inventory"].update_many({item_name: {"$exists": False}}, {"$set": {item_name.lower(): 0}})
 
-        elif option == "add item STR":
-            db[table].update_many({query_name: {"$exists": False}}, {"$set": {query_name: query_value_str}})
-            await ctx.respond("Added {" + query_name + ":" + str(query_value_str) +
-                              "} to all documents in table " + str(table) + "**DONT FORGET TO ADD TO CREATION CODE**")
+        except Exception as error:
+            await ctx.respond(f"Something went wrong. Do not try again.\n"
+                              f"{error}")
+
+            return
+
+        await ctx.respond(f"Added *{item_name}* to all existing inventories.\n"
+                          f"Added *{item_name}* to db[Items].\n"
+                          f"Make sure to edit `tools/item_handling.py` to let any changes take effect."
+                          f"/item will contain the new item after reboot.")
 
 
 def setup(client):

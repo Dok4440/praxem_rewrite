@@ -6,7 +6,7 @@ from discord.ext import commands
 from dotenv import load_dotenv
 from pymongo import MongoClient
 
-from tools import interaction, wembeds, _json, _db, tools
+from tools import interaction, wembeds, _json, _db, tools, item_handling
 
 load_dotenv('.env')
 dbclient = MongoClient(os.getenv('DBSTRING1'))
@@ -80,7 +80,7 @@ class Profile(commands.Cog):
                     if view.clickedYes:
                         '''database appending & finalizing'''
                         '''INVENTORY'''
-                        _db.create_inventory(target, main_weapon, secondary_weapon)
+                        item_handling.create_inventory(target, main_weapon, secondary_weapon)
 
                         '''PROFILE'''
                         maleFemaleRatio = [1, 2]

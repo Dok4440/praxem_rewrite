@@ -1,12 +1,11 @@
 import os
-import random
 
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv
 from pymongo import MongoClient
 
-from tools import interaction, wembeds, _json, _db, tools
+from tools import _json, item_handling
 
 load_dotenv('.env')
 dbclient = MongoClient(os.getenv('DBSTRING1'))
@@ -22,22 +21,23 @@ class Inventory(commands.Cog):
         print('inventory.py -> on_ready()')
 
     @discord.slash_command(
-        name = "inventory",
-        description = "View your inventory",
-        guild_only = True
+        name="inventory",
+        description="View your inventory",
+        guild_only=True
     )
     async def inventory(self, ctx):
         target = ctx.author.id
 
         check = db["Inventory"].count_documents({"_id": target})
         if check == 0:
-            em = discord.Embed(color=0xadcca6, description = f"**{ctx.author.name}#{ctx.author.discriminator}** I couldn't find any profile linked to your account. Create one with `/profile`")
+            em = discord.Embed(color=0xadcca6,
+                               description=f"**{ctx.author.name}#{ctx.author.discriminator}** I couldn't find any profile linked to your account. Create one with `/profile`")
             await ctx.respond(embed=em)
             return
 
         # inventory = db["Inventory"].find_one({"_id": target})
         inventory_document = db["Inventory"].find({"_id": target})
-        inventory_empty_list = _db.inv_list()
+        inventory_empty_list = item_handling.inventory_list()
 
         inventory_list = []
 
@@ -48,10 +48,7 @@ class Inventory(commands.Cog):
                 item_value = value[item]
                 inventory_list.append(f"{item_name}: {item_value}")
 
-        # inventory_list = ['main_weapon: %%', 'secondary_weapon: %%',
-        #                   'main_weapon_xp: 0', 'secondary_weapon_xp: 0', 'balance: 0', ....]
-        '''DECORATE'''
-        inventory_list = tools.decorate_inv_list(inventory_list)
+        inventory_list = item_handling.decorate_inventory_list(inventory_list)
 
         '''DEFINE ITEMS'''
         main_weapon = inventory_list[0]
@@ -60,7 +57,7 @@ class Inventory(commands.Cog):
 
         '''ITEM PAGES AND CHECK IF AMOUNT=0'''
         items = inventory_list[5:]
-        items = tools.decorate_inv_items(items)
+        items = item_handling.decorate_inventory_items(items)
 
         page_1 = ""
 
@@ -71,14 +68,50 @@ class Inventory(commands.Cog):
                 page_1 += "{}\n\n".format(item)
 
         '''CREATE EMBED'''
-        em=discord.Embed(color=0xadcca6, title=f"{ctx.author.name}'s Inventory",
-                         description=f"{main_weapon}\n"
-                                     f"{secondary_weapon}\n\n"
-                                     f"**Balance: {balance}** 💸")
+        em = discord.Embed(color=0xadcca6, title=f"{ctx.author.name}'s Inventory",
+                           description=f"{main_weapon}\n"
+                                       f"{secondary_weapon}\n\n"
+                                       f"**Balance: {balance}** 💸")
 
         em.add_field(name="ITEMS", value=page_1)
         em.set_thumbnail(url=_json.get_art()["bot_icon_longbow"])
         em.set_footer(text="do /item [item] to see detailed information.")
+
+        await ctx.respond(embed=em)
+
+    @discord.slash_command(
+        name="item",
+        description="View detailed information about an item",
+        guild_only=True
+    )
+    async def item(self, ctx, *, item: discord.Option(choices=item_handling.inventory_list()[5:])):
+        inventory = db["Inventory"].find({"_id": ctx.author.id})
+        for i in inventory:
+            item_amount = i[item]
+
+        description = ""
+        cost = 0
+        thumbnail = ""
+        emote = None
+
+        items = db["Items"].find({"_id": item})
+        for info in items:
+            description = info["description"]
+            cost = info["cost"]
+            thumbnail = info["image_url"]
+            emote = self.bot.get_emoji(info["emote_id"])
+
+        ''' CREATE EMBED'''
+        em = discord.Embed(color=0xadcca6, title=f"{emote} {item}", description=f"**Item cost: {cost}**")
+        em.add_field(name="Description", value=description)
+        em.set_thumbnail(url=thumbnail)
+
+        if item_amount > 1:
+            em.set_footer(text=f"You have this item {item_amount} times.")
+        elif item_amount == 1:
+            em.set_footer(text=f"You have this item {item_amount} times.")
+        else:
+            em.set_footer(text=f"You don't have this item.")
 
         await ctx.respond(embed=em)
 

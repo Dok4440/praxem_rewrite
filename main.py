@@ -26,8 +26,12 @@ async def on_ready():
 async def on_application_command_error(ctx, error):
     if isinstance(error, commands.CommandOnCooldown):
         await ctx.respond(error, ephemeral=True)
+        print("Cooldown error logged.")
+
     else:
+        await ctx.respond(error, ephemeral=True)
         raise error
+
 
 for filename in os.listdir('./modules'):
     if filename.endswith('.py'):

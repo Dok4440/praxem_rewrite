@@ -2,28 +2,10 @@ from dotenv import load_dotenv
 from pymongo import MongoClient
 import os
 from tools import _json
-import discord
 
 load_dotenv('.env')
 dbclient = MongoClient(os.getenv('DBSTRING1'))
 db = dbclient[os.getenv('DBSTRING2')]
-
-
-def create_inventory(id, main_weapon, secondary_weapon):
-    db["Inventory"].insert_one({"_id": id,
-                                "main_weapon": main_weapon,
-                                "secondary_weapon": secondary_weapon,
-                                "main_weapon_xp": 0,
-                                "secondary_weapon_xp": 0,
-                                "balance": 0,
-                                "apple": 1,
-                                "teleporting_potion": 3
-                                })
-
-
-def inv_list():
-    return ["main_weapon", "secondary_weapon", "main_weapon_xp",
-            "secondary_weapon_xp", "balance", "apple", "teleporting_potion"]
 
 
 def create_profile(id, gender, height, friend_id, age):
@@ -37,6 +19,7 @@ def create_profile(id, gender, height, friend_id, age):
                               "bio": "",
                               "badges": ""
                               })
+
 
 def delete_inventory(id):
     db["Inventory"].delete_one({"_id": id})
@@ -80,11 +63,6 @@ def get_weapon_stats(weapon, stat):
 
 def get_weapon_stats_list(weapon):
     return f"Damage: {get_weapon_stats(weapon, 'damage')}\nAccuracy: {get_weapon_stats(weapon, 'accuracy')}%\nDefence: {get_weapon_stats(weapon, 'defence')}%"
-
-
-def get_profile_looks(id):
-    for b in db["Profile"].find({"_id": id}):
-        return b["looks"]
 
 
 def get_training_status(id):
