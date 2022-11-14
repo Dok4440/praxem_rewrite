@@ -75,7 +75,7 @@ class Inventory(commands.Cog):
 
         em.add_field(name="ITEMS", value=page_1)
         em.set_thumbnail(url=_json.get_art()["bot_icon_longbow"])
-        em.set_footer(text="do /item [item] to see more info about a specific item")
+        em.set_footer(text="do /item [item] to see detailed information.")
 
         await ctx.respond(embed=em)
 
