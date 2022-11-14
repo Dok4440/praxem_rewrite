@@ -94,6 +94,10 @@ class Inventory(commands.Cog):
         cost = 0
         thumbnail = _json.get_art()["bot_icon_longbow"]
         emote = "❓"
+        item_type = "no_type_found"
+        sell_value = 0
+        quote = ""
+        top_description = ""
 
         try:
             items = db["Items"].find({"_id": item})
@@ -102,21 +106,36 @@ class Inventory(commands.Cog):
                 cost = info["cost"]
                 thumbnail = info["image_url"]
                 emote = self.bot.get_emoji(info["emote_id"])
+                item_type = info["item_type"]
+                sell_value = info["sell_value"]
+                quote = info["quote"]
 
         except Exception as error:
-            description += f"\n\n`{error}`"
+            pass
 
-        ''' CREATE EMBED'''
-        em = discord.Embed(color=0xadcca6, title=f"{emote} {item}", description=f"**Item cost: {cost}**")
-        em.add_field(name="Description", value=description)
-        em.set_thumbnail(url=thumbnail)
+        if sell_value == 0 and item_type != "sellable":
+            sell_value = "can't be sold"
 
         if item_amount > 1:
-            em.set_footer(text=f"You have this item {item_amount} times.")
+            amount_string = f"You have this item {item_amount} times."
         elif item_amount == 1:
-            em.set_footer(text=f"You have this item {item_amount} times.")
+            amount_string = f"You have this item {item_amount} time."
         else:
-            em.set_footer(text=f"You don't have this item.")
+            amount_string = f"You don't have this item."
+
+        if quote != "":
+            top_description = f"> *{quote}*\n\n{amount_string}"
+        else:
+            top_description = amount_string
+
+        ''' CREATE EMBED'''
+        em = discord.Embed(color=0xadcca6, title=f"{emote} {item.replace('_', ' ')}",
+                           description=top_description)
+
+        em.add_field(name="Value", value=f"`/shop` cost: **{cost}**\n`/sell` value: **{sell_value}**", inline=False)
+        em.add_field(name="Description", value=description, inline=False)
+        em.set_thumbnail(url=thumbnail)
+        em.set_footer(text=f"type: {item_type}")
 
         await ctx.respond(embed=em)
 

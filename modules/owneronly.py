@@ -105,19 +105,24 @@ class Owneronly(commands.Cog):
         guild_ids=["803957895603027978"]
     )
     async def add_item(self, ctx, *,
-                       item_name: discord.Option(str, description="One word. e.g. 'one two' becomes one_two."),
-                       item_description: discord.Option(str, description="Provide a description for this item."),
-                       item_cost: discord.Option(int, description="Whole, positive number."),
+                       name: discord.Option(str, description="One word. e.g. 'one two' becomes one_two."),
+                       description: discord.Option(str, description="Provide a description for this item."),
+                       cost: discord.Option(int, description="Whole, positive number."),
                        image_url: discord.Option(str, description="Imgur link of icon."),
-                       emote_id: discord.Option(str, description="ONLY ID (series of numbers)")
+                       emote_id: discord.Option(str, description="ONLY ID (series of numbers)"),
+                       item_type: discord.Option(choices=["collectable", "consumable", "sellable"]),
+                       sell_value: discord.Option(int, description="Only if item is 'sellable'") = 0,
+                       quote: discord.Option(str, description="Quote reason why this item was added?") = None
                        ):
 
         try:
             # update db["Items"]
-            db["Items"].insert_one({"_id": item_name.lower(), "description": item_description,
-                                    "cost": item_cost, "image_url": image_url, "emote_id": int(emote_id)})
+            db["Items"].insert_one({"_id": name.lower(), "description": description,
+                                    "cost": cost, "image_url": image_url, "emote_id": int(emote_id),
+                                    "type": item_type, "sell_value": sell_value, "quote": quote})
+
             # update existing inventories (dangerous)
-            db["Inventory"].update_many({item_name: {"$exists": False}}, {"$set": {item_name.lower(): 0}})
+            db["Inventory"].update_many({name: {"$exists": False}}, {"$set": {name.lower(): 0}})
 
         except Exception as error:
             await ctx.respond(f"Something went wrong. Do not try again.\n"
@@ -125,8 +130,8 @@ class Owneronly(commands.Cog):
 
             return
 
-        await ctx.respond(f"Added *{item_name}* to all existing inventories.\n"
-                          f"Added *{item_name}* to db[Items].\n"
+        await ctx.respond(f"Added *{name}* to all existing inventories.\n"
+                          f"Added *{name}* to db[Items].\n"
                           f"Make sure to edit `tools/item_handling.py` to let any changes take effect."
                           f"/item will contain the new item after reboot.")
 
