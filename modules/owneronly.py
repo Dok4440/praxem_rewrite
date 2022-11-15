@@ -62,6 +62,9 @@ class Owneronly(commands.Cog):
                                           guild_ids=[803957895603027978],
                                           guild_only=True,
                                           )
+    add = botconfig.create_subgroup("add", "Add something to the database")
+    edit = botconfig.create_subgroup("edit", "Edit something in the database")
+    remove = botconfig.create_subgroup("remove", "Remove something from the database")
 
     @botconfig.command(
         name="die",
@@ -95,8 +98,8 @@ class Owneronly(commands.Cog):
                 em.description = f"**{ctx.author.name}#{ctx.author.discriminator}** Shutting Down.."
                 await ctx.respond(embed=em)
 
-    @botconfig.command(
-        name="add_item",
+    @add.command(
+        name="item",
         description="Adds a new item to all inventories. Use with CAUTION."
     )
     @commands.check(is_team)
@@ -104,13 +107,15 @@ class Owneronly(commands.Cog):
                        name: discord.Option(str, description="One word. e.g. 'one two' becomes one_two."),
                        description: discord.Option(str, description="Provide a description for this item."),
                        cost: discord.Option(int, description="Whole, positive number."),
-                       image_url: discord.Option(str, description="Imgur link of icon."),
+                       image_url: discord.Option(str, description="Only accepts IMGUR links."),
                        emote_id: discord.Option(str, description="ONLY ID (series of numbers)"),
                        item_type: discord.Option(choices=["collectable", "consumable", "sellable"]),
-                       sell_value: discord.Option(int, description="Only if item is 'sellable'") = 0,
+                       sell_value: discord.Option(int, description="Only if item has type 'sellable'") = 0,
                        quote: discord.Option(str, description="Quote reason why this item was added?") = None
                        ):
 
+        if item_type != "sellable":
+            sell_value = 0
         try:
             db["Items"].insert_one({"_id": name.lower(), "description": description,
                                     "cost": cost, "image_url": image_url, "emote_id": int(emote_id),
@@ -138,8 +143,86 @@ class Owneronly(commands.Cog):
         await ctx.respond(f"Perform `/botconfig die message=\"item\"` for changes to take effect.",
                           ephemeral=True)
 
-    @botconfig.command(
-        name = "add_weapon",
+    @edit.command(
+        name = "item",
+        description = "Edit an item in the database."
+    )
+    async def edit_item(self, ctx, *,
+                        item: discord.Option(choices=item_handling.inventory_list()[5:], description="Which item do you want to edit?"),
+                        description: discord.Option(str, description="Edit the item's description") = None,
+                        cost: discord.Option(int, description="Change the /shop cost") = 0,
+                        image_url: discord.Option(str, description="Only accepts IMGUR links.") = None,
+                        emote_id: discord.Option(str, description="ONLY ID (series of numbers)") = None,
+                        item_type: discord.Option(choices=["collectable", "consumable", "sellable"]) = None,
+                        sell_value: discord.Option(int, description="Only if item has type 'sellable'") = 0,
+                        quote: discord.Option(str, description="Quote reason why this item was added?") = None
+                        ):
+        if item_type != "sellable":
+            sell_value = 0
+
+        if description is None and cost == 0 and image_url is None and emote_id is None and item_type is None and sell_value == 0 and quote is None:
+            await ctx.respond("Looks like you're changing nothing...\n\n"
+                              "*Note: if you're trying to change 'sell_value', "
+                              "make sure item_type is set to 'sellable'.*", ephemeral=True)
+            return
+
+        em = discord.Embed(color=0xadcca6,
+                           description=f"**{ctx.author.name}#{ctx.author.discriminator}** edited values:")
+
+        if description is not None:
+            try:
+                db["Items"].update_one({"_id": item}, {"$set": {"description": description}})
+                em.description += "\n`+ description`: value changed successfully."
+            except:
+                em.description += "\n`- description`: ERROR: unchanged."
+
+        if cost != 0:
+            try:
+                db["Items"].update_one({"_id": item}, {"$set": {"cost": cost}})
+                em.description += "\n`+ cost`: value changed successfully."
+            except:
+                em.description += "\n`- cost`: ERROR: unchanged."
+
+        if image_url is not None:
+            try:
+                db["Items"].update_one({"_id": item}, {"$set": {"image_url": image_url}})
+                em.description += "\n`+ image_url`: value changed successfully."
+            except:
+                em.description += "\n`- image_url`: ERROR: unchanged."
+
+        if emote_id is not None:
+            try:
+                db["Items"].update_one({"_id": item}, {"$set": {"emote_id": int(emote_id)}})
+                em.description += "\n`+ emote_id`: value changed successfully."
+            except:
+                em.description += "\n`- emote_id`: ERROR: unchanged."
+
+        if item_type is not None:
+            try:
+                db["Items"].update_one({"_id": item}, {"$set": {"item_type": item_type}})
+                em.description += "\n`+ item_type`: value changed successfully."
+            except:
+                em.description += "\n`- item_type`: ERROR: unchanged."
+
+        if sell_value != 0:
+            try:
+                db["Items"].update_one({"_id": item}, {"$set": {"sell_value": sell_value}})
+                em.description += "\n`+ sell_value`: value changed successfully."
+            except:
+                em.description += "\n`- sell_value`: ERROR: unchanged."
+
+        if quote is not None:
+            try:
+                db["Items"].update_one({"_id": item}, {"$set": {"description": description}})
+                em.description += "\n`+ quote`: value changed successfully."
+            except:
+                em.description += "\n`- quote`: ERROR: unchanged."
+
+        em.set_footer(text="do /item [item] to review the changes you made.")
+        await ctx.respond(embed=em)
+
+    @add.command(
+        name = "weapon",
         description="Adds a new weapon to the database. Use with CAUTION."
     )
     @commands.check(is_team)
