@@ -6,15 +6,15 @@ import discord
 from discord.ext import commands
 from dotenv import load_dotenv
 from pymongo import MongoClient
-from tools import tools
+from tools import tools, item_handling
 
 load_dotenv('.env')
 dbclient = MongoClient(os.getenv('DBSTRING1'))
 db = dbclient[os.getenv('DBSTRING2')]
 
 
-async def is_owner(ctx):
-    return ctx.author.id == 387984284734062592
+async def is_team(ctx):
+    return ctx.author.id in [387984284734062592, 379223333734187009, 275291823222816768]
 
 
 class Owneronly(commands.Cog):
@@ -43,14 +43,32 @@ class Owneronly(commands.Cog):
             await ch.send(embed=em)
 
     @discord.slash_command(
-        name="die",
+        name="vsay",
         description="Only Dok#4440 can do this. Command will only show up in this server.",
-        guild_only=True,
         default_member_permissions=discord.Permissions(permissions=8),
-        guild_ids=["803957895603027978"]
+        guild_only = True,
+        guild_ids=[803957895603027978]
     )
-    @commands.check(is_owner)
-    async def die(self, ctx, *, message: discord.Option(str) = None):
+    @commands.check(is_team)
+    async def vsay(self, ctx, *, message: discord.Option(str)):
+        emotes = [847124036206592020, 847124109875478591,
+                  847124082541854781, 847124132746756159]
+
+        emote = random.choice(emotes)
+        await ctx.send(f"{self.bot.get_emoji(emote)} `{tools.get_version()}` — {message}")
+
+    botconfig = discord.SlashCommandGroup("botconfig", "Settings for Project Ax bot admins.",
+                                          default_member_permissions=discord.Permissions(permissions=32),
+                                          guild_ids=[803957895603027978],
+                                          guild_only=True,
+                                          )
+
+    @botconfig.command(
+        name="die",
+        description="Restarts the bot. Add the 'pull' parameter to update."
+    )
+    @commands.check(is_team)
+    async def die(self, ctx, *, message: discord.Option(str, description="Add 'pull' to update.") = None):
         em = discord.Embed(color=0xadcca6)
         time_on_die = datetime.now()
 
@@ -77,33 +95,11 @@ class Owneronly(commands.Cog):
                 em.description = f"**{ctx.author.name}#{ctx.author.discriminator}** Shutting Down.."
                 await ctx.respond(embed=em)
 
-    @die.error
-    async def die_error(self, ctx, error):
-        await ctx.respond("Error: you're not bot owner. FYI: " +
-                          "this command is __only__ available in the official Praxem server, " +
-                          "so you won't be bothered by it anywhere else.")
-
-    @discord.slash_command(
-        name="vsay",
-        description="Only Dok#4440 can do this. Command will only show up in this server.",
-        default_member_permissions=discord.Permissions(permissions=8),
-        guild_ids=["803957895603027978"]
-    )
-    async def vsay(self, ctx, *, message: discord.Option(str)):
-        emotes = [847124036206592020, 847124109875478591,
-                  847124082541854781, 847124132746756159]
-
-        emote = random.choice(emotes)
-        await ctx.send(f"{self.bot.get_emoji(emote)} `{tools.get_version()}` — {message}")
-
-    botconfig = discord.SlashCommandGroup("botconfig", "Settings for Project Ax bot admins.")
-
     @botconfig.command(
         name="add_item",
-        description="Adds a new item to all inventories. Use with CAUTION.",
-        default_member_permissions=discord.Permissions(permissions=32), #ManageServer
-        guild_ids=["803957895603027978"]
+        description="Adds a new item to all inventories. Use with CAUTION."
     )
+    @commands.check(is_team)
     async def add_item(self, ctx, *,
                        name: discord.Option(str, description="One word. e.g. 'one two' becomes one_two."),
                        description: discord.Option(str, description="Provide a description for this item."),
@@ -116,7 +112,6 @@ class Owneronly(commands.Cog):
                        ):
 
         try:
-            # update db["Items"]
             db["Items"].insert_one({"_id": name.lower(), "description": description,
                                     "cost": cost, "image_url": image_url, "emote_id": int(emote_id),
                                     "item_type": item_type, "sell_value": sell_value, "quote": quote})
@@ -124,23 +119,30 @@ class Owneronly(commands.Cog):
             # update existing inventories (dangerous)
             db["Inventory"].update_many({name: {"$exists": False}}, {"$set": {name.lower(): 0}})
 
+            # edit item_list in db["Items"]
+            item_list = item_handling.inventory_list()
+            item_list.append(name.lower())
+            db["Items"].update_one({"_id": "item_definitions"}, {"$set": {"item_list": item_list}})
+
         except Exception as error:
             await ctx.respond(f"Something went wrong. Do not try again.\n"
                               f"{error}")
 
             return
 
-        await ctx.respond(f"Added *{name}* to all existing inventories.\n"
-                          f"Added *{name}* to db[Items].\n"
-                          f"Make sure to edit `tools/item_handling.py` to let any changes take effect."
-                          f"/item will contain the new item after reboot.")
+        em = discord.Embed(color=0xadcca6, description=f"**{ctx.author.name}#{ctx.author.discriminator}** "
+                                                       f"added {self.bot.get_emoji(int(emote_id))} **{name}** "
+                                                       f"as a new item.")
+        await ctx.respond(embed=em)
+
+        await ctx.respond(f"Perform `/botconfig die message=\"item\"` for changes to take effect.",
+                          ephemeral=True)
 
     @botconfig.command(
         name = "add_weapon",
-        description="Adds a new weapon to the database. Use with CAUTION.",
-        default_member_permissions=discord.Permissions(permissions=32),
-        guild_ids=["803957895603027978"]
+        description="Adds a new weapon to the database. Use with CAUTION."
     )
+    @commands.check(is_team)
     async def add_weapon(self, ctx, *,
                          name: discord.Option(str, description="Name of the weapon"),
                          damage: discord.Option(int),
@@ -148,7 +150,6 @@ class Owneronly(commands.Cog):
                          defense: discord.Option(int)
                          ):
         try:
-            # update db["WeaponStats"]
             db["WeaponStats"].insert_one({"_id": name.lower(), "damage": damage,
                                          "accuracy": accuracy, "defense": defense})
 
@@ -161,6 +162,17 @@ class Owneronly(commands.Cog):
                           f"Stats: {damage} dmg, {accuracy} %acc, {defense} %def.\n"
                           f"Make sure to edit `profile.py` to let any changes take effect.\n"
                           f"Reboot.")
+
+    # uncomment for reload command lol
+    # @botconfig.command(
+    #     name="reload",
+    #     description="Reloads a module."
+    # )
+    # async def reload(self, ctx, *, module:discord.Option(choices=["inventory", "profile", "misc", "help"])):
+    #     self.bot.reload_extension(f'modules.{module}')
+    #     em = discord.Embed(color=0xadcca6, description=f"**{ctx.author.name}#{ctx.author.discriminator}**
+    #                        module {module} has been reloaded.")
+    #     await ctx.respond(embed=em)
 
 
 def setup(client):

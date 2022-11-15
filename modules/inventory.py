@@ -110,7 +110,7 @@ class Inventory(commands.Cog):
                 sell_value = info["sell_value"]
                 quote = info["quote"]
 
-        except Exception as error:
+        except Exception:
             pass
 
         if sell_value == 0 and item_type != "sellable":

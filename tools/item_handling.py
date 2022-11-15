@@ -9,20 +9,24 @@ db = dbclient[os.getenv('DBSTRING2')]
 
 
 def create_inventory(id, main_weapon, secondary_weapon):
-    db["Inventory"].insert_one({"_id": id,
-                                "main_weapon": main_weapon,
-                                "secondary_weapon": secondary_weapon,
-                                "main_weapon_xp": 0,
-                                "secondary_weapon_xp": 0,
-                                "balance": 0,
-                                "apple": 0,
-                                "teleporting_potion": 0
-                                })
+    item_list = inventory_list()[5:]
+
+    dictionary = {"_id": id,"main_weapon": main_weapon,"secondary_weapon": secondary_weapon,
+                  "main_weapon_xp": 0,"secondary_weapon_xp": 0,"balance": 0}
+
+    for i in range(len(item_list)):
+        dictionary[item_list[i]] = 0
+
+    db["Inventory"].insert_one(dictionary)
 
 
 def inventory_list():
-    return ["main_weapon", "secondary_weapon", "main_weapon_xp",
-            "secondary_weapon_xp", "balance", "apple", "teleporting_potion"]
+    li = []
+    item = db["Items"].find({"_id": "item_definitions"})
+    for i in item:
+        li = i["item_list"]
+
+    return li
 
 
 def get_item_emote(item, bot):

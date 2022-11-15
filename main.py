@@ -28,6 +28,13 @@ async def on_application_command_error(ctx, error):
         await ctx.respond(error, ephemeral=True)
         print("Cooldown error logged.")
 
+    elif isinstance(error, commands.CheckFailure):
+        await ctx.respond("Error: you're not bot admin. FYI: " +
+                          "this command is __only__ available in the official Praxem server, " +
+                          "so you won't be bothered by it anywhere else.", ephemeral=True)
+
+        print("Check failure error logged.")
+
     else:
         await ctx.respond(error, ephemeral=True)
         raise error
