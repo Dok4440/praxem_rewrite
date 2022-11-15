@@ -16,6 +16,7 @@ def help_command_embed(name, description, usage, options, permissions):
     em.add_field(name="Usage", value=usage, inline=False)
 
     if options is not None:
+        options = ", ".join(options)
         em.add_field(name="options", value=options, inline=False)
 
     if permissions is not None:
