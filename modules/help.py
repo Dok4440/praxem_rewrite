@@ -38,7 +38,7 @@ class Help(commands.Cog):
                           "development team or check bot stats like latency, ping & version. You can also " \
                           "generate an invite link to let Praxem join your own server by using `/info invite`."
             usage = "`/info [option]`"
-            options = ["ping", "uptime", "team", "invite", "documentation", "version", "legal"]
+            options = ["ping", "team", "invite", "documentation", "version", "legal"]
 
         elif option == "item":
             name = "item"

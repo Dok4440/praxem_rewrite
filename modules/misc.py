@@ -19,17 +19,10 @@ class Miscellaneous(commands.Cog):
         name="info",
         description="Info about Praxem.",
         guild_only=False)
-    async def info(self, ctx, option: discord.Option(choices=["ping", "uptime", "team", "invite",
+    async def info(self, ctx, option: discord.Option(choices=["ping", "team", "invite",
                                                               "documentation", "version", "legal"])):
         if option == "ping":
             await ctx.respond(f"Project Ax Latency: {round(self.bot.latency*1000, 2)} ms")
-
-        elif option == "uptime":
-            uptime = str(datetime.timedelta(seconds=int(round(time.time() - bot_launch_time))))
-            em = discord.Embed(color=0xadcca6, description=uptime)
-            v = tools.get_version()
-            em.set_author(name=f"Project Ax {v}", icon_url= self.bot.user.avatar)
-            await ctx.respond(embed=em)
 
         elif option == "team":
             em = discord.Embed(color=0xadcca6)
