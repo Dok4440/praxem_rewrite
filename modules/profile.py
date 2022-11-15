@@ -23,7 +23,7 @@ class Profile(commands.Cog):
 
     @discord.slash_command(
         name="profile",
-        description="view your Project Ax profile",
+        description="View your Project Ax profile",
         guild_only=True
     )
     async def profile(self, ctx):

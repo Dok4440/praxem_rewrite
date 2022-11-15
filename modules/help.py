@@ -11,7 +11,7 @@ class Help(commands.Cog):
 
     @discord.slash_command(
         name="help",
-        description="get some more info about a command or feature",
+        description="Get some more info about a command or feature",
         guild_only=False )
     async def info(self, ctx, option: discord.Option(choices=["bag", "info", "item", "profile", "report"])):
         name = None
