@@ -1,5 +1,6 @@
 import os
 import random
+import sys
 from datetime import datetime
 
 import discord
@@ -26,6 +27,11 @@ class Owneronly(commands.Cog):
         print('owneronly.py -> on_ready()')
 
         if os.getenv('ISMAIN') == "True":
+            time_on_die = None
+            user_name = None
+            user_discrim = None
+            channel = None
+
             msg = db["DieMessage"].find({"_id": 1})
             for a in msg:
                 channel = a["channel_id"]
@@ -71,7 +77,7 @@ class Owneronly(commands.Cog):
         description="Restarts the bot. Add the 'pull' parameter to update."
     )
     @commands.check(is_team)
-    async def die(self, ctx, *, message: discord.Option(str, description="Add 'pull' to update.") = None):
+    async def die(self, ctx):
         em = discord.Embed(color=0xadcca6)
         time_on_die = datetime.now()
 
@@ -80,23 +86,9 @@ class Owneronly(commands.Cog):
             "$set": {"channel_id": ctx.channel.id, "user_name": ctx.author.name,
                      "user_discrim": ctx.author.discriminator, "time_on_die": time_on_die}}, upsert=True)
 
-        if message == "pull":
-            if (os.system("sh rAIOmp.sh") / 256) > 1:
-                var = os.system("sh rAIOmp.sh")  # this will run os.system() AGAIN.
-                await ctx.respond(
-                    f"Couldn't run `rAIOmp.sh`\n\n*os.system() output for BETA testing purposes; {var}*")
-            else:
-                em.description = f"**{ctx.author.name}#{ctx.author.discriminator}** Updating Project Ax.."
-                await ctx.respond(embed=em)
-
-        else:
-            if (os.system("sh rAIOm.sh") / 256) > 1:
-                var = os.system("sh rAIOm.sh")  # this will run os.system() AGAIN.
-                await ctx.respond(
-                    f"Couldn't run `rAIOm.sh`\n\n*os.system() output for BETA testing purposes; {var}*")
-            else:
-                em.description = f"**{ctx.author.name}#{ctx.author.discriminator}** Shutting Down.."
-                await ctx.respond(embed=em)
+        em.description = f"**{ctx.author.name}#{ctx.author.discriminator}** Updating Project Ax.."
+        await ctx.respond(embed=em)
+        os.execv(sys.argv[0], sys.argv)
 
     @add.command(
         name="item",
