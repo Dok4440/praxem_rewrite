@@ -88,7 +88,7 @@ class Owneronly(commands.Cog):
 
         em.description = f"**{ctx.author.name}#{ctx.author.discriminator}** Updating Project Ax.."
         await ctx.respond(embed=em)
-        os.execv(sys.argv[0], sys.argv)
+        os.execv(sys.executable, ['python'] + sys.argv)
 
     @add.command(
         name="item",
