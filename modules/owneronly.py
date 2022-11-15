@@ -26,27 +26,29 @@ class Owneronly(commands.Cog):
     async def on_ready(self):
         print('owneronly.py -> on_ready()')
 
-        if os.getenv('ISMAIN') == "True":
-            time_on_die = None
-            user_name = None
-            user_discrim = None
-            channel = None
+        time_on_die = None
+        user_name = None
+        user_discrim = None
+        channel = None
 
-            msg = db["DieMessage"].find({"_id": 1})
-            for a in msg:
-                channel = a["channel_id"]
-                user_name = a["user_name"]
-                user_discrim = a["user_discrim"]
-                time_on_die = a["time_on_die"]
+        collection = db["DieMessage"]
+        msg = collection.find({"_id": 1})
+        for a in msg:
+            channel = a["channel_id"]
+            user_name = a["user_name"]
+            user_discrim = a["user_discrim"]
+            time_on_die = a["time_on_die"]
 
-            time_now = datetime.now()
-            restart_time = (time_now - time_on_die).total_seconds()
+        collection.update_one({"_id": 1}, {"$set": {"channel_id": 839492558396456990}})
 
-            em = discord.Embed(color=0xadcca6, description=(
-                f"**{user_name}#{user_discrim}** It took me {round(restart_time, 2)} seconds to restart."))
+        time_now = datetime.now()
+        restart_time = (time_now - time_on_die).total_seconds()
 
-            ch = self.bot.get_channel(channel)
-            await ch.send(embed=em)
+        em = discord.Embed(color=0xadcca6, description=(
+            f"**{user_name}#{user_discrim}** it took me {round(restart_time, 2)}s to restart."))
+
+        ch = self.bot.get_channel(channel)
+        await ch.send(embed=em)
 
     @discord.slash_command(
         name="vsay",
@@ -86,7 +88,7 @@ class Owneronly(commands.Cog):
             "$set": {"channel_id": ctx.channel.id, "user_name": ctx.author.name,
                      "user_discrim": ctx.author.discriminator, "time_on_die": time_on_die}}, upsert=True)
 
-        em.description = f"**{ctx.author.name}#{ctx.author.discriminator}** Updating Project Ax.."
+        em.description = f"**{ctx.author.name}#{ctx.author.discriminator}** updating Project Ax.."
         await ctx.respond(embed=em)
         os.execv(sys.executable, ['python'] + sys.argv)
 
@@ -132,7 +134,7 @@ class Owneronly(commands.Cog):
                                                        f"as a new item.")
         await ctx.respond(embed=em)
 
-        await ctx.respond(f"Perform `/botconfig die message=\"item\"` for changes to take effect.",
+        await ctx.respond(f"Perform `/botconfig die` for changes to take effect.",
                           ephemeral=True)
 
     @edit.command(
