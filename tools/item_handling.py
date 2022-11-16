@@ -11,7 +11,7 @@ db = dbclient[os.getenv('DBSTRING2')]
 
 
 def create_inventory(id, main_weapon, secondary_weapon):
-    item_list = inventory_list()[5:]
+    item_list = inventory_list()
 
     dictionary = {"_id": id,"main_weapon": main_weapon,"secondary_weapon": secondary_weapon,
                   "main_weapon_xp": 0,"secondary_weapon_xp": 0,"balance": 0}
