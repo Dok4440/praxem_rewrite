@@ -86,6 +86,13 @@ class BagOptions(discord.ui.View):
             child.disabled = True
             await self.message.edit(view=None)
 
+    async def interaction_check(self, interaction) -> bool:
+        if interaction.user != self.ctx.author:
+            await interaction.response.send_message("You can't use this menu, it's someone else's!", ephemeral=True)
+            return False
+        else:
+            return True
+
     @discord.ui.select(
         placeholder = "All items",
         min_values = 1,
@@ -93,7 +100,8 @@ class BagOptions(discord.ui.View):
         options = [
             discord.SelectOption(
                 label="All items",
-                description="Show all items in your bag."
+                description="Show all items in your bag.",
+
             ),
             discord.SelectOption(
                 label="Consumables",
