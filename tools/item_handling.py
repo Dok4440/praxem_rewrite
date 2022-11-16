@@ -47,6 +47,7 @@ def item_list(type, target):
             item_value = document[item]
             items.append(f"{item_name}: {item_value}")
 
+    items.sort()
     return items
 
 
