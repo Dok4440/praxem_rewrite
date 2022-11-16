@@ -44,7 +44,7 @@ class Help(commands.Cog):
             name = "item"
             description = "View detailed information about an item."
             usage = "`/item [item]`"
-            options = item_handling.inventory_list()[5:]
+            options = item_handling.inventory_list()
 
         elif option == "profile":
             name = "profile"

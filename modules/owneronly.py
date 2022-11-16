@@ -64,6 +64,7 @@ class Owneronly(commands.Cog):
 
         emote = random.choice(emotes)
         await ctx.send(f"{self.bot.get_emoji(emote)} `{tools.get_version()}` — {message}")
+        await ctx.respond("Message sent.", ephemeral=True)
 
     botconfig = discord.SlashCommandGroup("botconfig", "Settings for Project Ax bot admins.",
                                           default_member_permissions=discord.Permissions(permissions=32),

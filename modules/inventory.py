@@ -5,7 +5,7 @@ from discord.ext import commands
 from dotenv import load_dotenv
 from pymongo import MongoClient
 
-from tools import _json, item_handling
+from tools import _json, item_handling, interaction
 
 load_dotenv('.env')
 dbclient = MongoClient(os.getenv('DBSTRING1'))
@@ -35,56 +35,21 @@ class Inventory(commands.Cog):
             await ctx.respond(embed=em)
             return
 
-        # inventory = db["Inventory"].find_one({"_id": target})
-        inventory_document = db["Inventory"].find({"_id": target})
-        inventory_empty_list = item_handling.inventory_list()
+        balance = 0
 
-        inventory_list = []
+        item = db["Inventory"].find({"_id": ctx.author.id})
+        for i in item:
+            balance = i["balance"]
 
-        '''GENERATE LIST'''
-        for value in inventory_document:
-            for item in inventory_empty_list:
-                item_name = item.replace("_", " ")
-                item_value = value[item]
-                inventory_list.append(f"{item_name}: {item_value}")
-
-        inventory_list = item_handling.decorate_inventory_list(inventory_list)
-
-        '''DEFINE ITEMS'''
-        main_weapon = inventory_list[0]
-        secondary_weapon = inventory_list[1]
-        balance = inventory_list[4]
-
-        '''ITEM PAGES AND CHECK IF AMOUNT=0'''
-        items = inventory_list[5:]
-        items = item_handling.decorate_inventory_items(items, self.bot)
-
-        page_1 = ""
-
-        if len(items) == 0:
-            page_1 += "You don't have any items."
-        else:
-            for item in items:
-                page_1 += "{}\n\n".format(item)
-
-        '''CREATE EMBED'''
-        em = discord.Embed(color=0xadcca6, title=f"{ctx.author.name}'s Inventory",
-                           description=f"{main_weapon}\n"
-                                       f"{secondary_weapon}\n\n"
-                                       f"**Balance: {balance}** 💸")
-
-        em.add_field(name="ITEMS", value=page_1)
-        em.set_thumbnail(url=_json.get_art()["bot_icon_longbow"])
-        em.set_footer(text="do /item [item] to see detailed information.")
-
-        await ctx.respond(embed=em)
+        await ctx.respond(embed=item_handling.pager(ctx, "all items", self.bot, balance),
+                          view=interaction.BagOptions(ctx, self.bot, balance))
 
     @discord.slash_command(
         name="item",
         description="View detailed information about an item",
         guild_only=True
     )
-    async def item(self, ctx, *, item: discord.Option(choices=item_handling.inventory_list()[5:])):
+    async def item(self, ctx, *, item: discord.Option(choices=item_handling.inventory_list())):
         item_amount = 0
         inventory = db["Inventory"].find({"_id": ctx.author.id})
         for i in inventory:
@@ -123,7 +88,7 @@ class Inventory(commands.Cog):
         else:
             amount_string = f"You don't have this item."
 
-        if quote != "":
+        if quote != "" and quote is not None:
             top_description = f"> *{quote}*\n\n{amount_string}"
         else:
             top_description = amount_string

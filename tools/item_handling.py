@@ -1,7 +1,9 @@
 import os
 
+import discord
 from dotenv import load_dotenv
 from pymongo import MongoClient
+from tools import _json
 
 load_dotenv('.env')
 dbclient = MongoClient(os.getenv('DBSTRING1'))
@@ -29,6 +31,25 @@ def inventory_list():
     return li
 
 
+def item_list(type, target):
+
+    if type.lower() == "all items":
+        item_names = inventory_list()
+    else:
+        item_names = db["Items"].find({"item_type": type}).distinct("_id")
+
+    inventory = db["Inventory"].find({"_id": target})
+    items = []
+
+    for document in inventory:
+        for item in item_names:
+            item_name = item.replace("_", " ")
+            item_value = document[item]
+            items.append(f"{item_name}: {item_value}")
+
+    return items
+
+
 def get_item_emote(item, bot):
     emote = '❓'
 
@@ -47,7 +68,6 @@ def decorate_inventory_items(list, bot):
 
         '''# INSERT EMOTE HERE TOO LATER'''
         name = li[0]
-        print(name)
         value = li[1]
         emote = get_item_emote(name.replace(" ", "_"), bot)
 
@@ -75,3 +95,44 @@ def decorate_inventory_list(list):
     list[1] = f"*{list[3]} XP* — **{list[1].capitalize()}**"
 
     return list
+
+
+def pager(ctx, type, bot, balance):
+    if type == "Consumables":
+        items = item_list("consumable", ctx.author.id)
+    elif type == "Collectables":
+        items = item_list("collectable", ctx.author.id)
+    else:
+        items = item_list("all items", ctx.author.id)
+
+    items = decorate_inventory_items(items, bot)
+
+    pages = ["page_1"]
+    pages_amount = len(items) // 8
+    for i in range(pages_amount):
+        pages.append(f"page_{i+2}")
+
+    if pages_amount > 0:
+        pass
+        # for later!
+
+    else:
+        pages[0] = ""
+
+        if len(items) == 0:
+            if type == "Consumables" or type == "Collectables":
+                pages[0] += "You don't have any items of this type."
+            else:
+                pages[0] += "You don't have any items."
+        else:
+            for item in items:
+                pages[0] += "{}\n\n".format(item)
+
+    em = discord.Embed(color=0xadcca6, title=f"{ctx.author.name}'s Bag",
+                       description=f"**Balance: {balance}** 💸")
+
+    em.add_field(name="ITEMS", value=pages[0])
+    em.set_thumbnail(url=_json.get_art()["bot_icon_longbow"])
+    em.set_footer(text="do /item [item] to see detailed information.")
+
+    return em
