@@ -59,8 +59,8 @@ class Owneronly(commands.Cog):
     )
     @commands.check(is_team)
     async def vsay(self, ctx, *, message: discord.Option(str)):
-        emotes = [847124036206592020, 847124109875478591,
-                  847124082541854781, 847124132746756159]
+        emotes = [1043088084486594560, 1043088085845545060,
+                  1043088092304785459]
 
         emote = random.choice(emotes)
         await ctx.send(f"{self.bot.get_emoji(emote)} `{tools.get_version()}` — {message}")
@@ -104,17 +104,20 @@ class Owneronly(commands.Cog):
                        cost: discord.Option(int, description="Whole, positive number."),
                        image_url: discord.Option(str, description="Only accepts IMGUR links."),
                        emote_id: discord.Option(str, description="ONLY ID (series of numbers)"),
-                       item_type: discord.Option(choices=["collectable", "consumable", "sellable"]),
-                       sell_value: discord.Option(int, description="Only if item has type 'sellable'") = 0,
+                       item_type: discord.Option(choices=["collectable", "consumable"]),
+                       sellable: discord.Option(bool, description="Can the item be sold in /shop?"),
+                       sell_value: discord.Option(int, description="Only if item is 'sellable'") = 0,
                        quote: discord.Option(str, description="Quote reason why this item was added?") = None
                        ):
 
-        if item_type != "sellable":
+        if not sellable:
             sell_value = 0
+
         try:
             db["Items"].insert_one({"_id": name.lower(), "description": description,
                                     "cost": cost, "image_url": image_url, "emote_id": int(emote_id),
-                                    "item_type": item_type, "sell_value": sell_value, "quote": quote})
+                                    "item_type": item_type, "sell_value": sell_value,
+                                    "quote": quote, "sellable": sellable})
 
             # update existing inventories (dangerous)
             db["Inventory"].update_many({name: {"$exists": False}}, {"$set": {name.lower(): 0}})
@@ -143,22 +146,26 @@ class Owneronly(commands.Cog):
         description = "Edit an item in the database."
     )
     async def edit_item(self, ctx, *,
-                        item: discord.Option(choices=item_handling.inventory_list()[5:], description="Which item do you want to edit?"),
+                        item: discord.Option(choices=item_handling.inventory_list(), description="Which item do you want to edit?"),
                         description: discord.Option(str, description="Edit the item's description") = None,
-                        cost: discord.Option(int, description="Change the /shop cost") = 0,
+                        cost: discord.Option(int, description="Change the /shop cost") = None,
                         image_url: discord.Option(str, description="Only accepts IMGUR links.") = None,
                         emote_id: discord.Option(str, description="ONLY ID (series of numbers)") = None,
                         item_type: discord.Option(choices=["collectable", "consumable", "sellable"]) = None,
-                        sell_value: discord.Option(int, description="Only if item has type 'sellable'") = 0,
+                        sellable: discord.Option(bool, description="Can the item be sold in /shop?") = None,
+                        sell_value: discord.Option(int, description="Only if item has type 'sellable'") = None,
                         quote: discord.Option(str, description="Quote reason why this item was added?") = None
                         ):
-        if item_type != "sellable":
+        if not sellable:
             sell_value = 0
 
-        if description is None and cost == 0 and image_url is None and emote_id is None and item_type is None and sell_value == 0 and quote is None:
+        if description is None and cost is None and image_url is None \
+                and emote_id is None and item_type is None\
+                and not sellable and sell_value is None and quote is None:
+
             await ctx.respond("Looks like you're changing nothing...\n\n"
                               "*Note: if you're trying to change 'sell_value', "
-                              "make sure item_type is set to 'sellable'.*", ephemeral=True)
+                              "make sure sellable is set to True.*", ephemeral=True)
             return
 
         em = discord.Embed(color=0xadcca6,
@@ -171,7 +178,7 @@ class Owneronly(commands.Cog):
             except:
                 em.description += "\n`- description`: ERROR: unchanged."
 
-        if cost != 0:
+        if cost is not None:
             try:
                 db["Items"].update_one({"_id": item}, {"$set": {"cost": cost}})
                 em.description += "\n`+ cost`: value changed successfully."
@@ -199,7 +206,14 @@ class Owneronly(commands.Cog):
             except:
                 em.description += "\n`- item_type`: ERROR: unchanged."
 
-        if sell_value != 0:
+        if sellable is not None:
+            try:
+                db["Items"].update_one({"_id": item}, {"$set": {"sellable": sellable}})
+                em.description += "\n`+ sellable`: value changed successfully."
+            except:
+                em.description += "\n`- sellable`: ERROR: unchanged."
+
+        if sell_value is not None:
             try:
                 db["Items"].update_one({"_id": item}, {"$set": {"sell_value": sell_value}})
                 em.description += "\n`+ sell_value`: value changed successfully."

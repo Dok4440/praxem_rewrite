@@ -63,6 +63,7 @@ class Inventory(commands.Cog):
         sell_value = 0
         quote = ""
         top_description = ""
+        sellable = False
 
         try:
             items = db["Items"].find({"_id": item})
@@ -74,11 +75,12 @@ class Inventory(commands.Cog):
                 item_type = info["item_type"]
                 sell_value = info["sell_value"]
                 quote = info["quote"]
+                sellable = info["sellable"]
 
         except Exception:
             pass
 
-        if sell_value == 0 and item_type != "sellable":
+        if sell_value == 0 or not sellable:
             sell_value = "can't be sold"
 
         if item_amount > 1:

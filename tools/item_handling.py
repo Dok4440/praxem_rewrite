@@ -11,10 +11,10 @@ db = dbclient[os.getenv('DBSTRING2')]
 
 
 def create_inventory(id, main_weapon, secondary_weapon):
-    item_list = inventory_list()
-
     dictionary = {"_id": id,"main_weapon": main_weapon,"secondary_weapon": secondary_weapon,
                   "main_weapon_xp": 0,"secondary_weapon_xp": 0,"balance": 0}
+
+    item_list = inventory_list()
 
     for i in range(len(item_list)):
         dictionary[item_list[i]] = 0
@@ -134,6 +134,9 @@ def pager(ctx, type, bot, balance):
 
     em.add_field(name="ITEMS", value=pages[0])
     em.set_thumbnail(url=_json.get_art()["bot_icon_longbow"])
-    em.set_footer(text="do /item [item] to see detailed information.")
+    em.set_footer(text=f"page 1/1")
+
+    if type == "Consumables" or type == "Collectables":
+        em.set_footer(text=f"page 1/1 — {type.lower()}")
 
     return em
