@@ -110,9 +110,6 @@ class Owneronly(commands.Cog):
                        quote: discord.Option(str, description="Quote reason why this item was added?") = None
                        ):
 
-        if not sellable:
-            sell_value = 0
-
         try:
             db["Items"].insert_one({"_id": name.lower(), "description": description,
                                     "cost": cost, "image_url": image_url, "emote_id": int(emote_id),
@@ -156,8 +153,6 @@ class Owneronly(commands.Cog):
                         sell_value: discord.Option(int, description="Only if item has type 'sellable'") = None,
                         quote: discord.Option(str, description="Quote reason why this item was added?") = None
                         ):
-        if not sellable:
-            sell_value = 0
 
         if description is None and cost is None and image_url is None \
                 and emote_id is None and item_type is None\
