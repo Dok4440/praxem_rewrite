@@ -76,11 +76,11 @@ class Owneronly(commands.Cog):
     remove = botconfig.create_subgroup("remove", "Remove something from the database")
 
     @botconfig.command(
-        name="die",
+        name="reload",
         description="Restarts the bot. Add the 'pull' parameter to update."
     )
     @commands.check(is_team)
-    async def die(self, ctx):
+    async def reload(self, ctx):
         em = discord.Embed(color=0xadcca6)
         time_on_die = datetime.now()
 
@@ -135,7 +135,7 @@ class Owneronly(commands.Cog):
                                                        f"as a new item.")
         await ctx.respond(embed=em)
 
-        await ctx.respond(f"Perform `/botconfig die` for changes to take effect.",
+        await ctx.respond(f"Perform `/botconfig reload` for changes to take effect.",
                           ephemeral=True)
 
     @edit.command(
