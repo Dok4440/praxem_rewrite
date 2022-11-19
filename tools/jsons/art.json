@@ -8,18 +8,22 @@
   "bow": "https://i.imgur.com/VVCvPNE.png",
   "longbow": "https://i.imgur.com/Fac0WdQ.png",
 
-  "longsword_emote_id": 841591365649170463,
-  "mace_emote_id": 841591275567579156,
-  "katana_emote_id": 841591388055273472,
-  "dagger_emote_id": 841591344308158516,
-  "greatsword_emote_id": 841591317368799242,
-  "sledgehammer_emote_id": 841591294115315753,
-  "bow_emote_id": 841631789675053077,
-  "longbow_emote_id": 841592788084326400,
+  "longsword_emote_id": 1043091858303234069,
+  "mace_emote_id": 1043091791295025182,
+  "katana_emote_id": 1043092266807463936,
+  "dagger_emote_id": 1043092540368375868,
+  "greatsword_emote_id": 1043092287980310528,
+  "sledgehammer_emote_id": 1043091618024132659,
+  "bow_emote_id": 1043092464615039056,
+  "longbow_emote_id": 1043091878180040704,
 
   "healing_potion": "https://i.imgur.com/ZpE5b68.png",
+  "shield_potion": "https://i.imgur.com/ORWaZD0.png",
+  "teleporting_potion": "https://i.imgur.com/UeIhvJX.png",
 
-  "healing_potion_emote_id": 845723621535121418,
+  "healing_potion_emote_id": 1043088873300951150,
+  "shield_potion_emote_id": 1043088874773159996,
+  "teleporting_potion_emote_id": 1043090219907416065,
 
   "gem_sp": "https://i.imgur.com/TJEY1CZ.png",
   "gem_df": "https://i.imgur.com/4YwywEC.png",
@@ -41,8 +45,15 @@
   "bot_icon_longsword_small": "https://i.imgur.com/eeGYJgf.png",
   "bot_icon_longbow_small": "https://i.imgur.com/CfZdEeE.png",
 
+  "badge_admin": "https://i.imgur.com/XQ9qxH1.png",
+  "badge_beta_tester": "https://i.imgur.com/Z8zQXuQ.png",
+
   "badge_admin_emote_id": 861292012766363658,
   "badge_beta_tester_emote_id": 861315295838470165,
-  "badge_admin": "https://i.imgur.com/XQ9qxH1.png",
-  "badge_beta_tester": "https://i.imgur.com/Z8zQXuQ.png"
+
+  "collectables": "https://i.imgur.com/cKN3nf2.png",
+  "consumables": "https://i.imgur.com/lpd4Gwi.png",
+
+  "collectables_emote_id": 1043084121053872168,
+  "consumables_emote_id": 1043084119619407922
 }

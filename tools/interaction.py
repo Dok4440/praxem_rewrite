@@ -94,22 +94,24 @@ class BagOptions(discord.ui.View):
             return True
 
     @discord.ui.select(
-        placeholder = "All items",
         min_values = 1,
         max_values = 1,
         options = [
             discord.SelectOption(
                 label="All items",
+                default=True,
                 description="Show all items in your bag.",
-
+                emoji="❓"
             ),
             discord.SelectOption(
                 label="Consumables",
-                description="Show all consumable bag items."
+                description="Show all consumable bag items.",
+                emoji="<:PA_consumables:1043084119619407922>"
             ),
             discord.SelectOption(
                 label="Collectables",
-                description="Show your collection of rare items."
+                description="Show your collection of rare items.",
+                emoji="<:PA_collectables:1043084121053872168>"
             )
         ]
     )
