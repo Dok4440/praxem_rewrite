@@ -25,6 +25,26 @@ def help_command_embed(name, description, usage, options, permissions):
     return em
 
 
+def maps_embed(ctx, area, district, zoom):
+
+    area = area.replace("_", " ")
+    district = district.replace("_", " ")
+    district = " ".join([
+        word.capitalize()
+        for word in district.split(" ")
+    ])
+
+    em = discord.Embed(color=0xadcca6, title=f"{ctx.author.name}'s location",
+                       description=f"🌍 **__{district}__**")
+
+    em.add_field(name=f"Area: {area.capitalize()}", value="Description about this area.."
+                                                          "\n\nDanger: peaceful"
+                                                          "\nDrops, materials, etc.")
+    em.set_image(url=zoom)
+
+    return em
+
+
 '''errors'''
 def error_1(a, b):
     em=discord.Embed(color=0xadcca6, description=f"**{a}#{b}** Something went wrong.")

@@ -45,7 +45,7 @@ class Owneronly(commands.Cog):
         restart_time = (time_now - time_on_die).total_seconds()
 
         em = discord.Embed(color=0xadcca6, description=(
-            f"**{user_name}#{user_discrim}** it took me {round(restart_time, 2)}s to restart."))
+            f"**{user_name}#{user_discrim}** it took me {round(restart_time, 2)}s to reload."))
 
         ch = self.bot.get_channel(channel)
         await ch.send(embed=em)
@@ -89,7 +89,7 @@ class Owneronly(commands.Cog):
             "$set": {"channel_id": ctx.channel.id, "user_name": ctx.author.name,
                      "user_discrim": ctx.author.discriminator, "time_on_die": time_on_die}}, upsert=True)
 
-        em.description = f"**{ctx.author.name}#{ctx.author.discriminator}** updating Project Ax.."
+        em.description = f"**{ctx.author.name}#{ctx.author.discriminator}** reloading.."
         await ctx.respond(embed=em)
         os.execv(sys.executable, ['python'] + sys.argv)
 

@@ -12,7 +12,7 @@ def create_profile(id, gender, height, friend_id, age):
     db["Profile"].insert_one({"_id": id,
                               "gender": gender,
                               "height": height,
-                              "location": "Ryedyng",
+                              "location": "fearann_mor,mines",
                               "friend_id": friend_id,
                               "age": age,
                               "xp": 0,

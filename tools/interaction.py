@@ -1,6 +1,6 @@
 import discord
 from discord.ui import Button, View, Modal
-from tools import wembeds, item_handling
+from tools import wembeds, item_handling, embeds
 
 
 class YesNoButtons(View):
@@ -69,6 +69,68 @@ class WeaponNavButtons(View):
     async def interaction_check(self, interaction) -> bool:
         if interaction.user != self.ctx.author:
             await interaction.response.send_message("You can't use these buttons, they're someone else's!", ephemeral=True)
+            return False
+        else:
+            return True
+
+
+class NavigationButtons(View):
+    def __init__(self, ctx, area, district, zoom_list, pr_client):
+        super().__init__(timeout=120)
+        self.ctx = ctx
+        self.bot = pr_client
+
+        self.area = area
+        self.district = district
+        self.zoom_list = zoom_list
+        self.zoom_level = 2
+        self.zoom = self.zoom_list[self.zoom_level]
+
+    @discord.ui.button(label="Zoom In", style=discord.ButtonStyle.gray,
+                       emoji="<:PA_zoom_in:1043919918673952832>", disabled=True,
+                       custom_id="zoomin")
+    async def zoomin_button_callback(self, button, interaction):
+        if not self.zoom_level == len(self.zoom_list) - 1:
+            self.zoom_level += 1
+
+        zoomin_button = button
+        zoomout_button = [x for x in self.children if x.custom_id == "zoomout"][0]
+
+        zoomout_button.disabled = False
+        zoomout_button.style = discord.ButtonStyle.blurple
+
+        if self.zoom_level == len(self.zoom_list) - 1:
+            zoomin_button.disabled = True
+            zoomin_button.style = discord.ButtonStyle.grey
+
+        self.zoom = self.zoom_list[self.zoom_level]
+        await interaction.response.edit_message(embed=embeds.maps_embed(self.ctx, self.area,
+                                                                        self.district, self.zoom), view=self)
+
+    @discord.ui.button(label="Zoom Out", style=discord.ButtonStyle.blurple,
+                       emoji="<:PA_zoom_out:1043919920620109874>", custom_id="zoomout")
+    async def zoomout_button_callback(self, button, interaction):
+        if not self.zoom_level == 0:
+            self.zoom_level -= 1
+
+        zoomin_button = [x for x in self.children if x.custom_id == "zoomin"][0]
+        zoomout_button = button
+
+        zoomin_button.disabled = False
+        zoomin_button.style = discord.ButtonStyle.blurple
+
+        if self.zoom_level == 0:
+            zoomout_button.disabled = True
+            zoomout_button.style = discord.ButtonStyle.grey
+
+        self.zoom = self.zoom_list[self.zoom_level]
+        await interaction.response.edit_message(embed=embeds.maps_embed(self.ctx, self.area,
+                                                                        self.district, self.zoom), view=self)
+
+    async def interaction_check(self, interaction) -> bool:
+        if interaction.user != self.ctx.author:
+            await interaction.response.send_message("You can't use these buttons, they're someone else's!",
+                                                    ephemeral=True)
             return False
         else:
             return True
