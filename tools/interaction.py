@@ -85,13 +85,16 @@ class WeaponNavButtons(View):
 
 
 class NavigationButtons(View):
-    def __init__(self, ctx, area, district, zoom_list, pr_client):
+    def __init__(self, ctx, area, district, difficulty, description, min_level, zoom_list, pr_client):
         super().__init__(timeout=90)
         self.ctx = ctx
         self.bot = pr_client
 
         self.area = area
         self.district = district
+        self.difficulty = difficulty
+        self.description = description
+        self.min_level = min_level
         self.zoom_list = zoom_list
         self.zoom_level = 2
         self.zoom = self.zoom_list[self.zoom_level]
@@ -120,7 +123,9 @@ class NavigationButtons(View):
 
         self.zoom = self.zoom_list[self.zoom_level]
         await interaction.response.edit_message(embed=embeds.maps_embed(self.ctx, self.area,
-                                                                        self.district, self.zoom), view=self)
+                                                                        self.district, self.difficulty,
+                                                                        self.description, self.min_level,
+                                                                        self.zoom), view=self)
 
     @discord.ui.button(label="Zoom Out", style=discord.ButtonStyle.blurple,
                        emoji="<:PA_zoom_out:1043919920620109874>", custom_id="zoomout")
@@ -140,7 +145,9 @@ class NavigationButtons(View):
 
         self.zoom = self.zoom_list[self.zoom_level]
         await interaction.response.edit_message(embed=embeds.maps_embed(self.ctx, self.area,
-                                                                        self.district, self.zoom), view=self)
+                                                                        self.district, self.difficulty,
+                                                                        self.description, self.min_level,
+                                                                        self.zoom), view=self)
 
     async def interaction_check(self, interaction) -> bool:
         if interaction.user != self.ctx.author:

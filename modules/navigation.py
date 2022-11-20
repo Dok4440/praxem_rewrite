@@ -27,23 +27,40 @@ class Navigation(commands.Cog):
     )
     async def map(self, ctx):
         location = None
-        maps_json = _json.get_map()
 
         profile_collection = db["Profile"].find({"_id": ctx.author.id})
         for i in profile_collection:
-            location = i["location"].split(sep=",")
+            location = i["location"]
 
-        district = location[0]
-        area = location[1]
+        world_map = None
+        district_map = None
+        area_map = None
+        difficulty = None
+        description = None
+        min_level = None
 
-        world_map = maps_json["zoom_level_0"][f"world_map_{district}"]
-        district_map = maps_json["zoom_level_1"][f"{district}_pointer_{area}"]
-        area_map = maps_json["zoom_level_2"][f"{district}_{area}"]
+        maps_collection = db["Maps"].find({"_id": location})
+        for x in maps_collection:
+            world_map = x["world_map_pointer_img"]
+            district_map = x["district_pointer_img"]
+            area_map = x["area_map_img"]
+            difficulty = x["difficulty"]
+            description = x["description"]
+            min_level = x["minimum_level"]
 
         zoom_list = [world_map, district_map, area_map]
 
-        await ctx.respond(embed=embeds.maps_embed(ctx, area, district, zoom_list[2]),
-                          view=interaction.NavigationButtons(ctx, area, district, zoom_list, self.bot))
+        location = location.split(sep=",")
+        district = location[0]
+        area = location[1]
+
+        await ctx.respond(embed=embeds.maps_embed(ctx, area, district,
+                                                  difficulty, description,
+                                                  min_level, zoom_list[2]),
+
+                          view=interaction.NavigationButtons(ctx, area, district,
+                                                             difficulty, description,
+                                                             min_level, zoom_list, self.bot))
 
 
 def setup(client):

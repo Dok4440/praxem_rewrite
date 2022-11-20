@@ -9,14 +9,6 @@ def get_profile(filename: str = "profile"):
         raise FileNotFoundError(f"{filename}.json wasn't found")
 
 
-def get_map(filename: str = "maps"):
-    try:
-        with open(f"tools/jsons/{filename}.json", encoding='utf8') as data:
-            return json.load(data)
-    except FileNotFoundError:
-        raise FileNotFoundError(f"{filename}.json wasn't found")
-
-
 def get_art(filename: str = "art"):
     try:
         with open(f"tools/jsons/{filename}.json", encoding='utf8') as data:
