@@ -41,7 +41,6 @@ class Navigation(commands.Cog):
         area_map = maps_json["zoom_level_2"][f"{district}_{area}"]
 
         zoom_list = [world_map, district_map, area_map]
-        print(zoom_list)
 
         await ctx.respond(embed=embeds.maps_embed(ctx, area, district, zoom_list[2]),
                           view=interaction.NavigationButtons(ctx, area, district, zoom_list, self.bot))

@@ -9,6 +9,11 @@ class YesNoButtons(View):
         self.ctx = ctx
         self.clickedYes = False
 
+    async def on_timeout(self):
+        for child in self.children:
+            child.disabled = True
+            await self.message.edit(view=None)
+
     @discord.ui.button(label="Yes!", style=discord.ButtonStyle.green, emoji="✅")
     async def yes_button_callback(self, button, interaction):
         await interaction.response.edit_message(view=None)
@@ -33,13 +38,18 @@ class YesNoButtons(View):
 
 class WeaponNavButtons(View):
     def __init__(self, ctx, weapon_list, pr_client):
-        super().__init__(timeout=120)
+        super().__init__(timeout=90)
         self.ctx = ctx
         self.bot = pr_client
 
         self.weapons = weapon_list
         self.page = 0
         self.weapon = self.weapons[self.page]
+
+    async def on_timeout(self):
+        for child in self.children:
+            child.disabled = True
+            await self.message.edit(view=None)
 
     @discord.ui.button(label="back", style=discord.ButtonStyle.blurple, emoji="◀️")
     async def back_button_callback(self, button, interaction):
@@ -76,7 +86,7 @@ class WeaponNavButtons(View):
 
 class NavigationButtons(View):
     def __init__(self, ctx, area, district, zoom_list, pr_client):
-        super().__init__(timeout=120)
+        super().__init__(timeout=90)
         self.ctx = ctx
         self.bot = pr_client
 
@@ -85,6 +95,11 @@ class NavigationButtons(View):
         self.zoom_list = zoom_list
         self.zoom_level = 2
         self.zoom = self.zoom_list[self.zoom_level]
+
+    async def on_timeout(self):
+        for child in self.children:
+            child.disabled = True
+            await self.message.edit(view=None)
 
     @discord.ui.button(label="Zoom In", style=discord.ButtonStyle.gray,
                        emoji="<:PA_zoom_in:1043919918673952832>", disabled=True,
