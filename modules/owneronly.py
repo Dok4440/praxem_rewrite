@@ -217,7 +217,7 @@ class Owneronly(commands.Cog):
 
         if quote is not None:
             try:
-                db["Items"].update_one({"_id": item}, {"$set": {"description": description}})
+                db["Items"].update_one({"_id": item}, {"$set": {"quote": quote}})
                 em.description += "\n`+ quote`: value changed successfully."
             except:
                 em.description += "\n`- quote`: ERROR: unchanged."
