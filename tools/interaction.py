@@ -1,6 +1,6 @@
 import discord
 from discord.ui import Button, View, Modal
-from tools import wembeds, item_handling, embeds
+from tools import wembeds, item_handling, traveler
 
 
 class YesNoButtons(View):
@@ -122,10 +122,10 @@ class NavigationButtons(View):
             zoomin_button.style = discord.ButtonStyle.grey
 
         self.zoom = self.zoom_list[self.zoom_level]
-        await interaction.response.edit_message(embed=embeds.maps_embed(self.ctx, self.area,
-                                                                        self.district, self.difficulty,
-                                                                        self.description, self.min_level,
-                                                                        self.zoom), view=self)
+        await interaction.response.edit_message(embed=traveler.one_map_embed(self.ctx, self.area,
+                                                                             self.district, self.difficulty,
+                                                                             self.description, self.min_level,
+                                                                             self.zoom), view=self)
 
     @discord.ui.button(label="Zoom Out", style=discord.ButtonStyle.blurple,
                        emoji="<:PA_zoom_out:1043919920620109874>", custom_id="zoomout")
@@ -144,10 +144,64 @@ class NavigationButtons(View):
             zoomout_button.style = discord.ButtonStyle.grey
 
         self.zoom = self.zoom_list[self.zoom_level]
-        await interaction.response.edit_message(embed=embeds.maps_embed(self.ctx, self.area,
-                                                                        self.district, self.difficulty,
-                                                                        self.description, self.min_level,
-                                                                        self.zoom), view=self)
+        await interaction.response.edit_message(embed=traveler.one_map_embed(self.ctx, self.area,
+                                                                             self.district, self.difficulty,
+                                                                             self.description, self.min_level,
+                                                                             self.zoom), view=self)
+
+    async def interaction_check(self, interaction) -> bool:
+        if interaction.user != self.ctx.author:
+            await interaction.response.send_message("You can't use these buttons, they're someone else's!",
+                                                    ephemeral=True)
+            return False
+        else:
+            return True
+
+
+class TravelButtons(View):
+    def __init__(self, ctx, area_dict_list, district, current_area):
+        super().__init__(timeout=90)
+        self.ctx = ctx
+        # self.bot = pr_client
+
+        self.area_dict_list = area_dict_list
+        self.district = district
+        self.current_area = current_area
+
+        self.area_number = 0
+        self.destination_area = self.area_dict_list[self.area_number]
+
+    async def on_timeout(self):
+        for child in self.children:
+            child.disabled = True
+            await self.message.edit(view=None)
+
+    @discord.ui.button(style=discord.ButtonStyle.blurple, emoji="◀️")
+    async def back_button_callback(self, button, interaction):
+        if self.area_number == 0:
+            self.area_number = len(self.area_dict_list)-1
+        else:
+            self.area_number -= 1
+
+        self.destination_area = self.area_dict_list[self.area_number]
+        await interaction.response.edit_message(embed=traveler.travel_map_embed(self.ctx, self.destination_area,
+                                                                                self.district, self.current_area))
+
+    @discord.ui.button(label="Travel here!", style=discord.ButtonStyle.blurple, disabled=True)
+    async def confirm_button_callback(self, button, interaction):
+        await interaction.response.edit_message(view=None)
+        self.stop()
+
+    @discord.ui.button(style=discord.ButtonStyle.blurple, emoji="▶️")
+    async def next_button_callback(self, button, interaction):
+        if self.area_number == len(self.area_dict_list) - 1:
+            self.area_number = 0
+        else:
+            self.area_number += 1
+
+        self.destination_area = self.area_dict_list[self.area_number ]
+        await interaction.response.edit_message(embed=traveler.travel_map_embed(self.ctx, self.destination_area,
+                                                                                self.district, self.current_area))
 
     async def interaction_check(self, interaction) -> bool:
         if interaction.user != self.ctx.author:
