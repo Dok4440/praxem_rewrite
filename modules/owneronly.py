@@ -2,6 +2,7 @@ import os
 import random
 import sys
 from datetime import datetime
+import git
 
 import discord
 from discord.ext import commands
@@ -87,7 +88,7 @@ class Owneronly(commands.Cog):
 
     @botconfig.command(
         name="reload",
-        description="Restarts the bot. Add the 'pull' parameter to update."
+        description="Refreshes bot files."
     )
     @commands.check(is_team)
     async def reload(self, ctx):
@@ -102,11 +103,29 @@ class Owneronly(commands.Cog):
         em.description = f"**{ctx.author.name}#{ctx.author.discriminator}** reloading.."
         await ctx.respond(embed=em)
 
-        print("----")
-        print("argv: "+ str(sys.argv))
-        print("executable: /usr/bin/python3")
-        print("----")
+        os.execv("/usr/bin/python3", ['python'] + sys.argv)
 
+    @botconfig.command(
+        name="update",
+        description="Updates Project Ax. Use with caution."
+    )
+    @commands.check(is_team)
+    async def reload(self, ctx):
+        em = discord.Embed(color=0xadcca6)
+        em.description = f"**{ctx.author.name}#{ctx.author.discriminator}** updating.."
+        em.set_footer(text="I will not show a message when the process is done.")
+        await ctx.respond(embed=em)
+
+        # pull from the repository
+        repo = git.Repo()
+        current = repo.head.commit
+        repo.remotes.origin.pull()
+        if current != repo.head.commit:
+            print("GIT PULL: updated!")
+        else:
+            print("GIT PULL: nothing changed.")
+
+        # restart the bot
         os.execv("/usr/bin/python3", ['python'] + sys.argv)
 
     @add.command(
