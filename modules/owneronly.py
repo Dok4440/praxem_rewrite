@@ -101,10 +101,14 @@ class Owneronly(commands.Cog):
 
         em.description = f"**{ctx.author.name}#{ctx.author.discriminator}** reloading.."
         await ctx.respond(embed=em)
+
+        os.execve('/usr/bin/python3', ['/usr/bin/python3'], {})
+
         print("----")
         print("argv: "+ str(sys.argv))
         print("executable: " + str(sys.executable))
         print("----")
+
         os.execv(sys.executable, ['python'] + sys.argv)
 
     @add.command(
