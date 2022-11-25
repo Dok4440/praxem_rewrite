@@ -4,6 +4,7 @@ import discord
 from discord.ext import commands
 from dotenv import load_dotenv
 from pymongo import MongoClient
+from database import db_items
 
 from tools import _json, item_handling, interaction
 
@@ -49,36 +50,23 @@ class Inventory(commands.Cog):
         description="View detailed information about an item",
         guild_only=True
     )
-    async def item(self, ctx, *, item: discord.Option(choices=item_handling.inventory_list())):
-        item_amount = 0
-        inventory = db["Inventory"].find({"_id": ctx.author.id})
-        for i in inventory:
-            item_amount = i[item]
+    async def item(self, ctx, *, item: discord.Option(choices=db_items.list_items())):
 
-        description = "N/A - no `db[Items]` ?"
-        cost = 0
-        thumbnail = _json.get_art()["bot_icon_longbow"]
-        emote = "❓"
-        item_type = "no_type_found"
-        sell_value = 0
-        quote = ""
+        item_id = db_items.get_item_id(item)
+        item_info = db_items.get_item_all_info(item_id)
+        item_amount = db_items.get_user_item_amount(ctx.author.id, item_id)
+
+        description     = item_info[2]
+        cost            = item_info[3]
+        image_url       = item_info[4]
+        emote           = self.bot.get_emoji(item_info[5])
+        item_type       = item_info[6]
+        sell_value      = item_info[7]
+        quote           = item_info[8]
+        sellable        = item_info[9]
+
         top_description = ""
-        sellable = False
-
-        try:
-            items = db["Items"].find({"_id": item})
-            for info in items:
-                description = info["description"]
-                cost = info["cost"]
-                thumbnail = info["image_url"]
-                emote = self.bot.get_emoji(info["emote_id"])
-                item_type = info["item_type"]
-                sell_value = info["sell_value"]
-                quote = info["quote"]
-                sellable = info["sellable"]
-
-        except Exception:
-            pass
+        thumbnail = image_url
 
         if sell_value == 0 or not sellable:
             sell_value = "can't be sold"

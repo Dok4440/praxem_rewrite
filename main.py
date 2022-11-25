@@ -1,18 +1,22 @@
 import logging
 import os
+from database import tables, db_items
 
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.ERROR)
 pr_client = discord.Bot(intents=discord.Intents.all())
 load_dotenv('.env')
+
+# sync praxem database
+tables.sync_database()
 
 
 @pr_client.event
 async def on_ready():
-    print('Bot is online.')
+    print('Project Ax is online.')
 
     if os.getenv('ISMAIN') == "True":
         game = discord.Game("/help")

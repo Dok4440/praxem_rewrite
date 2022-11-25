@@ -4,6 +4,7 @@ import discord
 from dotenv import load_dotenv
 from pymongo import MongoClient
 from tools import _json
+from database import db_items
 
 load_dotenv('.env')
 dbclient = MongoClient(os.getenv('DBSTRING1'))
@@ -14,7 +15,7 @@ def create_inventory(id, main_weapon, secondary_weapon):
     dictionary = {"_id": id,"main_weapon": main_weapon,"secondary_weapon": secondary_weapon,
                   "main_weapon_xp": 0,"secondary_weapon_xp": 0,"balance": 0}
 
-    item_list = inventory_list()
+    item_list = db_items.list_items()
 
     for i in range(len(item_list)):
         dictionary[item_list[i]] = 0
@@ -22,21 +23,12 @@ def create_inventory(id, main_weapon, secondary_weapon):
     db["Inventory"].insert_one(dictionary)
 
 
-def inventory_list():
-    li = []
-    item = db["Items"].find({"_id": "item_definitions"})
-    for i in item:
-        li = i["item_list"]
-
-    return li
-
-
 def item_list(type, target):
 
     if type.lower() == "all items":
-        item_names = inventory_list()
+        item_names = db_items.list_items()
     else:
-        item_names = db["Items"].find({"item_type": type}).distinct("_id")
+        item_names = db_items.list_items_by_type(type)
 
     inventory = db["Inventory"].find({"_id": target})
     items = []

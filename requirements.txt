@@ -6,3 +6,4 @@ async-timeout==4.0.2
 py-cord==2.2.2
 dnspython==2.2.1
 python-dotenv==0.21.0
+setuptools~=60.2.0

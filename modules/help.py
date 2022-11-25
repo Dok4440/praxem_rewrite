@@ -3,6 +3,7 @@ from discord.ext import commands
 from discord.ext.commands import cog
 from tools import embeds, item_handling
 import typing
+from database import db_items
 
 
 class Help(commands.Cog):
@@ -44,7 +45,7 @@ class Help(commands.Cog):
             name = "item"
             description = "View detailed information about an item."
             usage = "`/item [item]`"
-            options = item_handling.inventory_list()
+            options = db_items.list_items()
 
         elif option == "profile":
             name = "profile"

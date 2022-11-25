@@ -8,6 +8,8 @@ from discord.ext import commands
 from dotenv import load_dotenv
 from pymongo import MongoClient
 from tools import tools, item_handling
+from database import database, db_items
+from sqlite3 import Error
 
 load_dotenv('.env')
 dbclient = MongoClient(os.getenv('DBSTRING1'))
@@ -76,6 +78,14 @@ class Owneronly(commands.Cog):
     remove = botconfig.create_subgroup("remove", "Remove something from the database")
 
     @botconfig.command(
+        name="sqlselect",
+        description="Performs an database SQL query and returns the output."
+    )
+    @commands.check(is_team)
+    async def sqlselect(self, ctx, *, query: discord.Option(str, description="The SQL query")):
+        await ctx.respond(f"**Your query: SELECT {query}**\n\nOUTPUT:\n```{database.select_query(query)}```")
+
+    @botconfig.command(
         name="reload",
         description="Restarts the bot. Add the 'pull' parameter to update."
     )
@@ -95,7 +105,7 @@ class Owneronly(commands.Cog):
 
     @add.command(
         name="item",
-        description="Adds a new item to all inventories. Use with CAUTION."
+        description="Adds a new item to the database."
     )
     @commands.check(is_team)
     async def add_item(self, ctx, *,
@@ -111,23 +121,12 @@ class Owneronly(commands.Cog):
                        ):
 
         try:
-            db["Items"].insert_one({"_id": name.lower(), "description": description,
-                                    "cost": cost, "image_url": image_url, "emote_id": int(emote_id),
-                                    "item_type": item_type, "sell_value": sell_value,
-                                    "quote": quote, "sellable": sellable})
-
-            # update existing inventories (dangerous)
-            db["Inventory"].update_many({name: {"$exists": False}}, {"$set": {name.lower(): 0}})
-
-            # edit item_list in db["Items"]
-            item_list = item_handling.inventory_list()
-            item_list.append(name.lower())
-            db["Items"].update_one({"_id": "item_definitions"}, {"$set": {"item_list": item_list}})
+            db_items.add_item(name.lower(), description, cost,
+                              image_url, int(emote_id), item_type,
+                              sell_value, quote, sellable)
 
         except Exception as error:
-            await ctx.respond(f"Something went wrong. Do not try again.\n"
-                              f"{error}")
-
+            await ctx.respond(f"Something went wrong. Do not try again.\n{error}")
             return
 
         em = discord.Embed(color=0xadcca6, description=f"**{ctx.author.name}#{ctx.author.discriminator}** "
@@ -138,12 +137,32 @@ class Owneronly(commands.Cog):
         await ctx.respond(f"Perform `/botconfig reload` for changes to take effect.",
                           ephemeral=True)
 
+    @remove.command(
+        name="item",
+        description="Remove an item from the database entirely"
+    )
+    @commands.check(is_team)
+    async def remove_item(self, ctx, *, item: discord.Option(choices=db_items.list_items())):
+        try:
+            item_id = db_items.get_item_id(item)
+            db_items.remove_item(item_id)
+
+        except Error as error:
+            await ctx.respond(f"Something went wrong. Do not try again.\n{error}")
+            return
+
+        em = discord.Embed(color=0xadcca6, description=f"**{ctx.author.name}#{ctx.author.discriminator}** "
+                                                       f"successfully removed item '{item}'.")
+        await ctx.respond(embed=em)
+        await ctx.respond(f"Perform `/botconfig reload` for changes to take effect.", ephemeral=True)
+
     @edit.command(
         name = "item",
         description = "Edit an item in the database."
     )
     async def edit_item(self, ctx, *,
-                        item: discord.Option(choices=item_handling.inventory_list(), description="Which item do you want to edit?"),
+                        item: discord.Option(choices=db_items.list_items(), description="Which item do you want to edit?"),
+                        name:discord.Option(str, description="One word. e.g. 'one two' becomes one_two.") = None,
                         description: discord.Option(str, description="Edit the item's description") = None,
                         cost: discord.Option(int, description="Change the /shop cost") = None,
                         image_url: discord.Option(str, description="Only accepts IMGUR links.") = None,
@@ -154,7 +173,7 @@ class Owneronly(commands.Cog):
                         quote: discord.Option(str, description="Quote reason why this item was added?") = None
                         ):
 
-        if description is None and cost is None and image_url is None \
+        if name is None and description is None and cost is None and image_url is None \
                 and emote_id is None and item_type is None\
                 and not sellable and sell_value is None and quote is None:
 
@@ -163,66 +182,83 @@ class Owneronly(commands.Cog):
                               "make sure sellable is set to True.*", ephemeral=True)
             return
 
+        item_id = db_items.get_item_id(item)
         em = discord.Embed(color=0xadcca6,
-                           description=f"**{ctx.author.name}#{ctx.author.discriminator}** edited values:")
+                           description=f"**'{item}'** edited values:")
+
+        if name is not None:
+            try:
+                db_items.update_item("name", name, item_id)
+                em.description += "\n`+ name`: value changed successfully."
+            except Error as e:
+                em.description += "\n`- name`: ERROR: unchanged."
+                print(f"Edit item error: {e}")
 
         if description is not None:
             try:
-                db["Items"].update_one({"_id": item}, {"$set": {"description": description}})
+                db_items.update_item("description", description, item_id)
                 em.description += "\n`+ description`: value changed successfully."
-            except:
+            except Error as e:
                 em.description += "\n`- description`: ERROR: unchanged."
+                print(f"Edit item error: {e}")
 
         if cost is not None:
             try:
-                db["Items"].update_one({"_id": item}, {"$set": {"cost": cost}})
+                db_items.update_item("cost", cost, item_id)
                 em.description += "\n`+ cost`: value changed successfully."
-            except:
+            except Error as e:
                 em.description += "\n`- cost`: ERROR: unchanged."
+                print(f"Edit item error: {e}")
 
         if image_url is not None:
             try:
-                db["Items"].update_one({"_id": item}, {"$set": {"image_url": image_url}})
+                db_items.update_item("image_url", image_url, item_id)
                 em.description += "\n`+ image_url`: value changed successfully."
-            except:
+            except Error as e:
                 em.description += "\n`- image_url`: ERROR: unchanged."
+                print(f"Edit item error: {e}")
 
         if emote_id is not None:
             try:
-                db["Items"].update_one({"_id": item}, {"$set": {"emote_id": int(emote_id)}})
+                db_items.update_item("emote_id", int(emote_id), item_id)
                 em.description += "\n`+ emote_id`: value changed successfully."
-            except:
+            except Error as e:
                 em.description += "\n`- emote_id`: ERROR: unchanged."
+                print(f"Edit item error: {e}")
 
         if item_type is not None:
             try:
-                db["Items"].update_one({"_id": item}, {"$set": {"item_type": item_type}})
+                db_items.update_item("item_type", item_type, item_id)
                 em.description += "\n`+ item_type`: value changed successfully."
-            except:
+            except Error as e:
                 em.description += "\n`- item_type`: ERROR: unchanged."
+                print(f"Edit item error: {e}")
 
         if sellable is not None:
             try:
-                db["Items"].update_one({"_id": item}, {"$set": {"sellable": sellable}})
+                db_items.update_item("sellable", sellable, item_id)
                 em.description += "\n`+ sellable`: value changed successfully."
-            except:
+            except Error as e:
                 em.description += "\n`- sellable`: ERROR: unchanged."
+                print(f"Edit item error: {e}")
 
         if sell_value is not None:
             try:
-                db["Items"].update_one({"_id": item}, {"$set": {"sell_value": sell_value}})
+                db_items.update_item("sell_value", sell_value, item_id)
                 em.description += "\n`+ sell_value`: value changed successfully."
-            except:
+            except Error as e:
                 em.description += "\n`- sell_value`: ERROR: unchanged."
+                print(f"Edit item error: {e}")
 
         if quote is not None:
             try:
-                db["Items"].update_one({"_id": item}, {"$set": {"quote": quote}})
+                db_items.update_item("item_quote", quote, item_id)
                 em.description += "\n`+ quote`: value changed successfully."
-            except:
+            except Error as e:
                 em.description += "\n`- quote`: ERROR: unchanged."
+                print(f"Edit item error: {e}")
 
-        em.set_footer(text="do /item [item] to review the changes you made.")
+        em.set_footer(text=f"do /item {item} to review the changes you made.")
         await ctx.respond(embed=em)
 
     @add.command(
