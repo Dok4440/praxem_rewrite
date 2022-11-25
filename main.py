@@ -1,8 +1,3 @@
-print()
-print("---------")
-print("PRAXEM RESTART")
-print("---------")
-
 import logging
 import os
 from database import tables, db_items
