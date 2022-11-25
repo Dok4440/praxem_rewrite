@@ -1,8 +1,10 @@
 import os
+import shutil
 import random
 import sys
 from datetime import datetime
 import git
+import time
 
 import discord
 from discord.ext import commands
@@ -115,6 +117,14 @@ class Owneronly(commands.Cog):
         em.description = f"**{ctx.author.name}#{ctx.author.discriminator}** updating.."
         em.set_footer(text="I will not show a message when the process is done.")
         await ctx.respond(embed=em)
+
+        # create database backup
+        t = time.time()
+        os.mkdir(f"db_backup/BACKUP_{int(t)}")
+        shutil.copy("database/praxem.db", f"db_backup/BACKUP_{int(t)}")
+
+        # delete backups older than 7 days
+        # os.system("find db_backup/ -name \"BACKUP_*\" -mtime +7 -type d | xargs rm -f -r;")
 
         # pull from the repository
         repo = git.Repo()

@@ -16,3 +16,4 @@ tools/art/result_dia_*.*
 
 # db
 *.db
+db_backup/
