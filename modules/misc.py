@@ -29,7 +29,7 @@ class Miscellaneous(commands.Cog):
             v = tools.get_version()
             em.set_author(name=f"Project Ax {v}", icon_url=self.bot.user.avatar)
             em.add_field(name="**__Team__**",
-                         value="**Dok#4440** - Software Development\n**JuicyBblue#0004** - Artwork\n**Axie#8831** - Project Design",
+                         value="**stupidbeaver** - Software Development\n**JuicyBblue#0004** - Artwork\n**Axie#8831** - Project Design",
                          inline=False)
             em.add_field(name="**__Contributors__**", value="Yuan Mizuna#9666", inline=False)
             await ctx.respond(embed=em)

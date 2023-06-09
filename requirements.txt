@@ -1,9 +1,8 @@
 pip==21.3.1
 Pillow==9.3.0
 pymongo==4.3.2
-pymongo==4.3.2
 async-timeout==4.0.2
-py-cord==2.2.2
+py-cord==2.4.1
 dnspython==2.2.1
 python-dotenv==0.21.0
 setuptools~=60.2.0
